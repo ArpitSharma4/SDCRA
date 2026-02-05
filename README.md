@@ -1,73 +1,90 @@
-# Welcome to your Lovable project
+# 🛰️ SDCRA: Space Debris Collision & Risk Analyser
 
-## Project info
+> **A real-time, 3D/2D visualization suite for monitoring orbital debris and assessing collision risks in Low Earth Orbit (LEO).**
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+![Project Status](https://img.shields.io/badge/Status-Under_Development-amber?style=for-the-badge)
+![Tech Stack](https://img.shields.io/badge/Stack-React_|_Three.js_|_TypeScript-cyan?style=for-the-badge)
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🚧 Project Status: Active Development
+**This project is currently in Alpha.**
+Core visualization engines (3D & 2D) and the SGP4 propagation logic are functional, but UI refinements, mobile optimization, and constellation tracking features are still being implemented.
+*Expect occasional breaking changes or API rate limits (CelesTrak).*
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## 🌍 Overview
+**SDCRA** (Space Debris Collision & Risk Analyser) is designed to visualize the "Kessler Syndrome" — the growing threat of orbital debris cascading into a collision chain reaction. It moves beyond simple tracking lists, offering a **"Planetary MRI"** of space traffic.
 
-Changes made via Lovable will be committed automatically to this repo.
+### 🎮 Key Modules (Implemented)
 
-**Use your preferred IDE**
+#### 1. 🔭 The Command Terminal (Home)
+A cinematic, data-driven entry point featuring a typewriter-style briefing on the state of orbital overcrowding.
+- **Aesthetic:** NASA/Sci-Fi Terminal with Monospace typography.
+- **Visuals:** Real-time rotating Earth asset with atmospheric shaders.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+#### 2. 💥 Orbit Risk Analyser (3D)
+An interactive 3D simulation to visualize specific collision scenarios between two objects.
+- **Features:** - Real-time SGP4 Propagation (predicting satellite positions).
+    - **"Tactical HUD"** Overlay: Displays Altitude, Velocity, and Target tracking.
+    - **Offline Mode:** Fallback to local datasets when API limits are reached.
+    - **Visuals:** Custom starfield, accurate day/night cycle, and color-coded orbit paths.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+#### 3. 🌡️ Global Density Map (Heatmap)
+A "Mission Control" style 2D visualization of global debris density.
+- **View:** Mercator Projection "Wall Map".
+- **Data Layers:** - 🔴 **Debris/Rocket Bodies** (The Danger Zones).
+    - 🔵 **Active Satellites** (Assets).
+    - 💠 **Starlink Constellations** (Mega-constellations).
+- **Tech:** High-performance HTML5 Canvas rendering (10,000+ objects at 60 FPS).
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🛠️ Tech Stack
+* **Frontend Framework:** React + Vite
+* **Language:** TypeScript
+* **3D Engine:** Three.js / React Three Fiber (R3F)
+* **Styling:** Tailwind CSS (Glassmorphism & Neon UI)
+* **Math/Physics:** `satellite.js` (SGP4 TLE propagation)
+* **Data Source:** CelesTrak API
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🚀 Getting Started
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+### Prerequisites
+* Node.js (v16 or higher)
+* npm or yarn
 
-**Edit a file directly in GitHub**
+### Installation
+1.  Clone the repo:
+    ```bash
+    git clone [https://github.com/ArpitSharma4/SDCRA.git](https://github.com/ArpitSharma4/SDCRA.git)
+    ```
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+3.  Start the development server:
+    ```bash
+    npm run dev
+    ```
+4.  Open `http://localhost:5173` (or your local port) to view the Mission Control.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 📅 Roadmap / Upcoming Features
+- [ ] **Constellation Tracker:** Dedicated view for Starlink/OneWeb trains.
+- [ ] **Collision Probability:** Mathematical risk assessment (Pc) calculator.
+- [ ] **Mobile Optimization:** Responsive layout for tablets/phones.
+- [ ] **Historical Data:** "Time Machine" slider to view debris growth (1957-2025).
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## ⚠️ API Note
+This application relies on **CelesTrak** for TLE data. If you see an "Offline Mode" badge, it means the IP rate limit was reached. The app will automatically switch to cached sample data to ensure the visualization never breaks.
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+*Built with 💻 and ☕ by Arpit Sharma.*
