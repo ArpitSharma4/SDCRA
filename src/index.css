@@ -1,0 +1,289 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Space Debris Collision Risk Analyser - Design System
+   Dark space theme with cyan/blue accents
+   All colors in HSL format
+*/
+
+@layer base {
+  :root {
+    /* Core Space Theme Colors - Lighter Version */
+    --background: 220 35% 12%;
+    --foreground: 210 40% 96%;
+    
+    /* Ensure full viewport coverage */
+    @apply h-full;
+    
+    /* Smooth scrolling */
+    scroll-behavior: smooth;
+
+    --card: 220 35% 15%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 220 35% 18%;
+    --popover-foreground: 210 40% 96%;
+
+    /* Primary - Electric Cyan */
+    --primary: 192 95% 55%;
+    --primary-foreground: 222 47% 4%;
+
+    /* Secondary - Lighter Space Blue */
+    --secondary: 217 33% 22%;
+    --secondary-foreground: 210 40% 96%;
+
+    /* Muted - Lighter Space Gray */
+    --muted: 217 33% 18%;
+    --muted-foreground: 215 25% 65%;
+
+    /* Accent - Bright Blue */
+    --accent: 217 91% 60%;
+    --accent-foreground: 210 40% 98%;
+
+    /* Destructive - Warning Orange/Red */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Warning - Amber */
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 47% 4%;
+
+    /* Success - Space Green */
+    --success: 142 76% 46%;
+    --success-foreground: 222 47% 4%;
+
+    --border: 217 33% 18%;
+    --input: 217 33% 15%;
+    --ring: 192 95% 55%;
+
+    --radius: 0.75rem;
+
+    /* Custom Space Theme Variables */
+    --space-dark: 222 47% 3%;
+    --space-navy: 222 47% 8%;
+    --space-glow: 192 95% 55%;
+    --space-glow-dim: 192 70% 40%;
+    --space-blue: 217 91% 60%;
+    --space-purple: 265 70% 55%;
+    --star-white: 0 0% 100%;
+
+    /* Gradient definitions */
+    --gradient-space: linear-gradient(180deg, hsl(222 47% 3%) 0%, hsl(222 47% 8%) 50%, hsl(217 33% 12%) 100%);
+    --gradient-glow: linear-gradient(135deg, hsl(192 95% 55%) 0%, hsl(217 91% 60%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(222 47% 9%) 0%, hsl(222 47% 6%) 100%);
+    
+    /* Shadows */
+    --shadow-glow: 0 0 40px hsl(192 95% 55% / 0.3);
+    --shadow-glow-strong: 0 0 60px hsl(192 95% 55% / 0.5);
+    --shadow-card: 0 4px 24px hsl(222 47% 3% / 0.5);
+    --shadow-elevated: 0 8px 32px hsl(222 47% 3% / 0.8);
+
+    /* Sidebar */
+    --sidebar-background: 222 47% 6%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 192 95% 55%;
+    --sidebar-primary-foreground: 222 47% 4%;
+    --sidebar-accent: 217 33% 15%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 217 33% 15%;
+    --sidebar-ring: 192 95% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border m-0 p-0;
+  }
+  
+  html, body, #root {
+    @apply h-full w-full m-0 p-0 overflow-x-hidden;
+    background: hsl(var(--background));
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    background: linear-gradient(
+      to bottom,
+      hsl(222, 47%, 4%) 0%,
+      hsl(222, 47%, 6%) 100%
+    );
+    /* Global monospace font with legibility improvements */
+    font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+    font-size: 16px; /* Slightly larger base size for monospace */
+    line-height: 1.6; /* Comfortable line height for readability */
+    letter-spacing: 0.02em; /* Slightly increased letter spacing */
+  }
+
+  /* Ensure headings remain bold and maintain hierarchy */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+    font-weight: 700; /* Explicit bold for monospace */
+    letter-spacing: 0.01em; /* Slightly tighter spacing for headings */
+  }
+
+  /* Improve readability for long text content */
+  p, .text-content {
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+  }
+
+  /* Special handling for technical data displays */
+  .font-mono {
+    font-family: 'JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+  }
+
+  /* Ensure form inputs are comfortable to read */
+  input, textarea, select {
+    font-size: 15px; /* Slightly smaller for inputs */
+    line-height: 1.5;
+  }
+
+  /* Code blocks and technical displays */
+  code, pre {
+    font-family: 'JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+@layer components {
+  /* Glow text effect */
+  .text-glow {
+    text-shadow: 0 0 20px hsl(var(--primary) / 0.5),
+                 0 0 40px hsl(var(--primary) / 0.3);
+  }
+
+  .text-glow-subtle {
+    text-shadow: 0 0 10px hsl(var(--primary) / 0.3);
+  }
+
+  /* Glass effect */
+  .glass {
+    @apply backdrop-blur-md bg-background/60 border border-border/50;
+  }
+
+  .glass-strong {
+    @apply backdrop-blur-xl bg-background/80 border border-border;
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-space {
+    background: var(--gradient-space);
+  }
+
+  .bg-gradient-glow {
+    background: var(--gradient-glow);
+  }
+
+  .bg-gradient-card {
+    background: var(--gradient-card);
+  }
+
+  /* Border glow */
+  .border-glow {
+    @apply border-primary/50;
+    box-shadow: inset 0 0 20px hsl(var(--primary) / 0.1),
+                0 0 20px hsl(var(--primary) / 0.15);
+  }
+
+  /* Animated gradient border */
+  .gradient-border {
+    position: relative;
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--gradient-glow);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  /* Starfield animation */
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  .animate-twinkle {
+    animation: twinkle 3s ease-in-out infinite;
+  }
+
+  /* Pulse glow */
+  @keyframes pulse-glow {
+    0%, 100% { 
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.4);
+    }
+    50% { 
+      box-shadow: 0 0 40px hsl(var(--primary) / 0.6);
+    }
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  /* Scan line effect */
+  @keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+
+  .animate-scan {
+    animation: scan 8s linear infinite;
+  }
+
+  /* Float animation */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  /* Orbit animation */
+  @keyframes orbit {
+    0% { transform: rotate(0deg) translateX(10px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(10px) rotate(-360deg); }
+  }
+
+  .animate-orbit {
+    animation: orbit 20s linear infinite;
+  }
+}
+
+@layer utilities {
+  /* Custom scrollbar */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+}
