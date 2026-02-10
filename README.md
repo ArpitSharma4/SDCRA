@@ -9,7 +9,7 @@
 ---
 
 ## Overview
-**SDCRA** is a planetary defense dashboard that transforms raw orbital data into actionable intelligence. Unlike standard trackers, it focuses on **risk assessment**—monitoring orbital decay in VLEO (Very Low Earth Orbit), visualizing global debris density, and predicting local overpasses.
+**SDCRA** is a planetary defense dashboard that transforms raw orbital data into actionable intelligence. Unlike standard trackers, it focuses on **risk assessment**—monitoring orbital decay in VLEO (Very Low Earth Orbit) and visualizing collision probabilities.
 
 The interface is built with a "Classified System" aesthetic, prioritizing data density and telemetry over gamified visuals.
 
@@ -17,7 +17,13 @@ The interface is built with a "Classified System" aesthetic, prioritizing data d
 
 ## Active Subsystems
 
-### 1. Orbital Decay Monitor (Reentry Watch)
+### 1. Home (Mission Control)
+The central command interface providing a high-level overview of the orbital environment.
+- **Global Status:** Real-time metrics on the total tracked object count.
+- **System Telemetry:** Live feed of orbital parameters and system diagnostics.
+- **Visuals:** Cinematic, data-driven entry point featuring a rotating Earth asset with atmospheric shaders.
+
+### 2. Orbital Decay Monitor (Reentry Watch)
 A tactical dashboard for tracking satellites at risk of atmospheric reentry.
 - **VLEO Monitoring:** Filters for objects with high Mean Motion (>15.5 revs/day) and low altitude (<300km).
 - **Drag Analysis:** Real-time flagging of "High Drag" corridors where orbital lifetime is critical.
@@ -27,21 +33,17 @@ A tactical dashboard for tracking satellites at risk of atmospheric reentry.
   - **WARNING:** 180 km - 300 km (High Drag)
   - **CRITICAL:** < 180 km (Reentry Imminent)
 
-### 2. Sky Watch (Local Tracking)
-A real-time topocentric radar that answers: *"What is flying over my location right now?"*
-- **Radar Display:** A polar plot visualization showing Azimuth and Elevation of objects relative to the user's GPS position.
-- **Pass Predictions:** Calculates upcoming flyovers for major assets (ISS, Hubble, Starlink) with precise countdowns and visibility ratings.
-- **Visual Filters:** Toggle between Active Satellites, Debris, and Constellations to reduce signal noise.
-
-### 3. Global Density Heatmap
-A strategic "Situation Room" map visualizing the distribution of orbital traffic.
-- **Data Layers:** Color-coded visualization distinguishing between debris fields (Red), active payloads (Blue), and mega-constellations (Starlink).
-- **Night Side Visualization:** Uses a dark-mode projection to highlight illumination states and orbital density clusters.
-
-### 4. Orbit Risk Core
+### 3. Orbit Risk Analyser (3D Physics Core)
 The central physics engine driving the SDCRA platform.
+- **3D Visualization:** A fully interactive WebGL globe rendering specific orbital paths.
 - **SGP4 Propagation:** Performs real-time math in the browser to predict satellite positions from NORAD TLE data.
-- **Collision Risk Assessment:** Models potential conjunctions and orbital intersections.
+- **Collision Assessment:** Models potential conjunctions and visualizes orbital intersections.
+
+### 4. About (Classified Briefing)
+A narrative-driven documentation interface.
+- **The Kessler Syndrome:** Educational breakdown of the collision cascade effect.
+- **Project Specs:** Detailed technical documentation presented as a classified mission file.
+- **Operator Profile:** Developer credentials and tech stack specifications.
 
 ---
 
