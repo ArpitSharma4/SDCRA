@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Menu, X, Satellite } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-type Section = 'home' | 'problem' | 'heatmap' | 'how-it-works' | 'features';
+type Section = 'home' | 'problem' | 'about' | 'reentry' | 'features';
 
 interface NavigationProps {
   onNavigate: (section: Section) => void;
@@ -14,9 +14,8 @@ interface NavigationProps {
 const navItems = [
   { label: 'Home', section: 'home' as const },
   { label: 'Orbit Risk', section: 'problem' as const },
-  { label: 'Heatmap', section: 'heatmap' as const },
-  { label: 'Constellations', section: 'how-it-works' as const },
-  { label: 'About', section: 'features' as const },
+  { label: 'Reentry Watch', section: 'reentry' as const },
+  { label: 'About', section: 'about' as const },
 ];
 
 export function Navigation({ onNavigate, activeSection, brandName = "SDCRA" }: NavigationProps) {

@@ -260,6 +260,84 @@
   .animate-orbit {
     animation: orbit 20s linear infinite;
   }
+
+  /* Classified dossier / terminal effects */
+  .scanlines {
+    position: relative;
+  }
+  .scanlines::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.15) 2px,
+      rgba(0, 0, 0, 0.15) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  @keyframes glitch {
+    0% { clip-path: inset(0 0 100% 0); transform: translate(-2px, 2px); }
+    20% { clip-path: inset(20% 0 60% 0); transform: translate(2px, -2px); }
+    40% { clip-path: inset(40% 0 40% 0); transform: translate(-2px, 2px); }
+    60% { clip-path: inset(60% 0 20% 0); transform: translate(2px, -2px); }
+    80% { clip-path: inset(80% 0 0 0); transform: translate(-2px, 2px); }
+    100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+  }
+  .glitch-text {
+    position: relative;
+    display: inline-block;
+  }
+  .glitch-text:hover .glitch-text-inner,
+  .glitch-text:focus-within .glitch-text-inner {
+    animation: glitch 0.4s ease-in-out;
+  }
+  .glitch-text::before,
+  .glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.8;
+  }
+  .glitch-text:hover::before {
+    animation: glitch 0.4s ease-in-out;
+    color: hsl(192 95% 55%);
+    clip-path: inset(40% 0 40% 0);
+    transform: translate(-3px, 0);
+    text-shadow: 3px 0 hsl(320 80% 50%);
+  }
+  .glitch-text:hover::after {
+    animation: glitch 0.4s ease-in-out 0.1s reverse;
+    color: hsl(192 95% 55%);
+    clip-path: inset(60% 0 20% 0);
+    transform: translate(3px, 0);
+    text-shadow: -3px 0 hsl(142 76% 46%);
+  }
+
+  @keyframes cursor-blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+  .cursor-blink::after {
+    content: '▌';
+    animation: cursor-blink 1s step-end infinite;
+    margin-left: 2px;
+  }
+
+  @keyframes log-scroll {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+  }
+  .log-scroll-inner {
+    animation: log-scroll 30s linear infinite;
+  }
 }
 
 @layer utilities {

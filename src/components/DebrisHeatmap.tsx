@@ -26,18 +26,18 @@ export const DebrisHeatmap: React.FC<DebrisHeatmapProps> = ({
   // Generate particle data based on actual satellite counts
   const particleData = useMemo(() => {
     let particleCount = 0;
-    
+
     // Calculate total particles needed (limit for performance)
     if (showActive && activeData.satellites.size > 0) particleCount += Math.min(activeData.satellites.size, 100);
     if (showStarlink && starlinkData.satellites.size > 0) particleCount += Math.min(starlinkData.satellites.size, 200);
     if (showDebris) particleCount += 800; // Reduced debris count for performance
-    
+
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
     const sizes = new Float32Array(particleCount);
-    
+
     let index = 0;
-    
+
     // Add active satellites (cyan)
     if (showActive && activeData.satellites.size > 0) {
       const activeCount = Math.min(activeData.satellites.size, 100);
@@ -45,20 +45,20 @@ export const DebrisHeatmap: React.FC<DebrisHeatmapProps> = ({
         const radius = 1.2 + Math.random() * 0.8;
         const theta = Math.random() * Math.PI * 2;
         const phi = Math.random() * Math.PI;
-        
+
         positions[index * 3] = radius * Math.sin(phi) * Math.cos(theta);
         positions[index * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
         positions[index * 3 + 2] = radius * Math.cos(phi);
-        
+
         colors[index * 3] = 0.133; // Cyan (#22d3ee)
         colors[index * 3 + 1] = 0.827;
         colors[index * 3 + 2] = 0.933;
-        
+
         sizes[index] = 0.02 + Math.random() * 0.02;
         index++;
       }
     }
-    
+
     // Add Starlink satellites (cyan)
     if (showStarlink && starlinkData.satellites.size > 0) {
       const starlinkCount = Math.min(starlinkData.satellites.size, 200);
@@ -66,20 +66,20 @@ export const DebrisHeatmap: React.FC<DebrisHeatmapProps> = ({
         const radius = 1.3 + Math.random() * 0.7;
         const theta = Math.random() * Math.PI * 2;
         const phi = Math.random() * Math.PI;
-        
+
         positions[index * 3] = radius * Math.sin(phi) * Math.cos(theta);
         positions[index * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
         positions[index * 3 + 2] = radius * Math.cos(phi);
-        
+
         colors[index * 3] = 0.133; // Cyan (#22d3ee)
         colors[index * 3 + 1] = 0.827;
         colors[index * 3 + 2] = 0.933;
-        
+
         sizes[index] = 0.02 + Math.random() * 0.02;
         index++;
       }
     }
-    
+
     // Add debris particles (red/orange)
     if (showDebris) {
       const debrisCount = 800;
@@ -87,20 +87,20 @@ export const DebrisHeatmap: React.FC<DebrisHeatmapProps> = ({
         const radius = 1.1 + Math.random() * 1.2;
         const theta = Math.random() * Math.PI * 2;
         const phi = Math.random() * Math.PI;
-        
+
         positions[index * 3] = radius * Math.sin(phi) * Math.cos(theta);
         positions[index * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
         positions[index * 3 + 2] = radius * Math.cos(phi);
-        
+
         colors[index * 3] = 0.937; // Red/Orange (#ef4444)
         colors[index * 3 + 1] = 0.267;
         colors[index * 3 + 2] = 0.267;
-        
+
         sizes[index] = 0.015 + Math.random() * 0.015;
         index++;
       }
     }
-    
+
     return {
       positions,
       colors,
@@ -114,7 +114,10 @@ export const DebrisHeatmap: React.FC<DebrisHeatmapProps> = ({
   // Simplified animation for better performance
   useFrame(() => {
     timeRef.current += 0.005; // Slower animation
-    
+
+
+    timeRef.current += 0.010;
+
     const points = pointsRef.current;
     if (points && points.material) {
       const material = points.material as THREE.PointsMaterial;

@@ -17,7 +17,10 @@ export const DebrisMap2D: React.FC<DebrisMap2DProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number>();
-  const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 });
+  const [dimensions, setDimensions] = useState({ 
+    width: typeof window !== 'undefined' ? window.innerWidth : 1920, 
+    height: typeof window !== 'undefined' ? window.innerHeight : 1080 
+  });
 
   // Fetch satellite data
   const activeData = useSatelliteData('active');
@@ -120,14 +123,29 @@ export const DebrisMap2D: React.FC<DebrisMap2DProps> = ({
     const handleResize = () => {
       const container = canvasRef.current?.parentElement;
       if (container) {
-        setDimensions({
-          width: container.clientWidth,
-          height: container.clientHeight
-        });
+        const width = container.clientWidth || window.innerWidth;
+        const height = container.clientHeight || window.innerHeight;
+        const newDimensions = {
+          width: Math.max(width, 800),
+          height: Math.max(height, 600)
+        };
+        console.log('DebrisMap2D: Resizing canvas to', newDimensions);
+        setDimensions(newDimensions);
+      } else {
+        // Fallback to window dimensions if container not found
+        const newDimensions = {
+          width: window.innerWidth,
+          height: window.innerHeight
+        };
+        console.log('DebrisMap2D: Using window dimensions', newDimensions);
+        setDimensions(newDimensions);
       }
     };
 
+    // Initial resize immediately and with delays to ensure DOM is ready
     handleResize();
+    setTimeout(handleResize, 50);
+    setTimeout(handleResize, 200);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -139,6 +157,12 @@ export const DebrisMap2D: React.FC<DebrisMap2DProps> = ({
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // Ensure canvas has valid dimensions
+    if (dimensions.width <= 0 || dimensions.height <= 0) {
+      console.warn('DebrisMap2D: Invalid dimensions, skipping render');
+      return;
+    }
 
     let lastFrameTime = 0;
     const targetFPS = 1; // 1 FPS for clean, non-chaotic display
@@ -158,32 +182,41 @@ export const DebrisMap2D: React.FC<DebrisMap2DProps> = ({
       ctx.globalCompositeOperation = 'source-over';
 
       // Draw satellites
-      allSatellites.forEach((satellite) => {
-        const coords = getSatelliteCoords(satellite);
-        const { x, y } = latLonToXY(coords.lat, coords.lon, dimensions.width, dimensions.height);
+      try {
+        allSatellites.forEach((satellite) => {
+          try {
+            const coords = getSatelliteCoords(satellite);
+            const { x, y } = latLonToXY(coords.lat, coords.lon, dimensions.width, dimensions.height);
 
-        // Skip if outside canvas bounds
-        if (x < 0 || x > dimensions.width || y < 0 || y > dimensions.height) {
-          return;
-        }
+            // Skip if outside canvas bounds
+            if (x < 0 || x > dimensions.width || y < 0 || y > dimensions.height) {
+              return;
+            }
 
-        // Set color based on type
-        let color = '#ffffff';
-        if (satellite.type === 'debris') {
-          color = '#ff4444'; // Red for debris
-        } else if (satellite.type === 'starlink') {
-          color = '#4444ff'; // Blue for Starlink
-        } else {
-          color = '#00ccff'; // Cyan for active
-        }
+            // Set color based on type
+            let color = '#ffffff';
+            if (satellite.type === 'debris') {
+              color = '#ff4444'; // Red for debris
+            } else if (satellite.type === 'starlink') {
+              color = '#4444ff'; // Blue for Starlink
+            } else {
+              color = '#00ccff'; // Cyan for active
+            }
 
-        // Draw satellite as a small, crisp circle
-        ctx.fillStyle = color;
-        ctx.globalAlpha = 0.6; // Consistent opacity
-        ctx.beginPath();
-        ctx.arc(x, y, 1.5, 0, Math.PI * 2); // Small 1.5px radius
-        ctx.fill();
-      });
+            // Draw satellite as a small, crisp circle
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 0.6; // Consistent opacity
+            ctx.beginPath();
+            ctx.arc(x, y, 1.5, 0, Math.PI * 2); // Small 1.5px radius
+            ctx.fill();
+          } catch (satError) {
+            // Skip individual satellite if it causes an error
+            console.warn('Error rendering satellite:', satError);
+          }
+        });
+      } catch (renderError) {
+        console.error('Error in render loop:', renderError);
+      }
 
       // Reset alpha
       ctx.globalAlpha = 1.0;
@@ -200,8 +233,11 @@ export const DebrisMap2D: React.FC<DebrisMap2DProps> = ({
     };
   }, [allSatellites, dimensions]);
 
+  // Show loading state if all data sources are loading
+  const isLoading = activeData.isLoading && starlinkData.isLoading && stationsData.isLoading && debris1999Data.isLoading && iridiumDebrisData.isLoading;
+
   return (
-    <div className="relative w-full h-full overflow-hidden bg-slate-950">
+    <div className="relative w-full h-full overflow-hidden bg-slate-950" style={{ minHeight: '100%' }}>
       {/* Clean dark background with subtle grid */}
       <div 
         className="absolute inset-0 bg-cover bg-center"
@@ -218,9 +254,17 @@ export const DebrisMap2D: React.FC<DebrisMap2DProps> = ({
         height={dimensions.height}
         className="absolute inset-0 w-full h-full"
         style={{
-          imageRendering: 'crisp-edges'
+          imageRendering: 'crisp-edges',
+          minHeight: '100%'
         }}
       />
+      
+      {/* Loading indicator */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
+          <div className="text-white text-sm">Loading satellite data...</div>
+        </div>
+      )}
 
       {/* Clean Legend */}
       <div className="absolute bottom-4 right-4 bg-slate-900/90 backdrop-blur-sm border border-slate-700 rounded-lg p-3 text-xs">
