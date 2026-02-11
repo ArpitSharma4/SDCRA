@@ -18,6 +18,7 @@ const ReentryWatchPage = lazy(() => import("./pages/ReentryWatchPage"));
 const SatcatPage = lazy(() => import("./pages/SatcatPage"));
 const Contact = lazy(() => import("./pages/Contact"));
 const FaqPage = lazy(() => import("./pages/FaqPage"));
+const DocumentationPage = lazy(() => import("./pages/DocumentationPage"));
 
 const queryClient = new QueryClient();
 
@@ -75,6 +76,7 @@ const AppWithNavigation = () => {
             <Route path="/satcat" element={<SatcatPage />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<FaqPage />} />
+            <Route path="/documentation" element={<DocumentationPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

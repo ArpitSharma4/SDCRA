@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Telescope, AlertTriangle, Sun, Moon, Github, Twitter, Linkedin, Mail, Satellite, Database } from 'lucide-react';
+import { ArrowRight, Telescope, AlertTriangle, Sun, Moon, Github, Twitter, Linkedin, Mail, Satellite, Database, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Earth3D } from './Earth3D';
 import { TypewriterTitle } from './TypewriterTitle';
@@ -20,7 +20,7 @@ const footerLinks = {
     { label: 'Analytics', href: '/admin/analytics' },
   ],
   Resources: [
-    { label: 'Documentation', href: '#' },
+    { label: 'Documentation', href: '/documentation' },
     { label: 'TLE Database', href: '/satcat' },
     { label: 'Research Papers', href: '#' },
     { label: 'FAQ', href: '/faq' },
@@ -136,7 +136,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
                 <Database className="w-5 h-5 mr-2" />
                 SEARCH SATCAT
               </Button>
-            </div>
+                          </div>
             
             {/* Day/Night Toggle - Moved next to CTA buttons */}
             <div className="flex items-center gap-2 ml-0 sm:ml-4">
