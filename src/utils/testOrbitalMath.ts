@@ -13,7 +13,7 @@ const STARLINK_TLE2 = {
 };
 
 export function testTwoPassAlgorithm() {
-  console.log('🧪 Testing Two-Pass Algorithm...');
+  console.log(' Testing Two-Pass Algorithm...');
   
   try {
     // Create SatRec objects
@@ -23,15 +23,15 @@ export function testTwoPassAlgorithm() {
     // Test with 24-hour timeframe
     const result = analyzeConjunction(sat1, sat2, 24);
     
-    console.log('✅ Two-Pass Algorithm Test Results:');
-    console.log(`   Min Distance: ${result.minDistanceKm} km`);
-    console.log(`   Time of Closest Approach: ${result.timeOfClosestApproach?.toUTCString()}`);
-    console.log(`   Risk Level: ${result.riskLevel}`);
-    console.log(`   Calculation Duration: ${result.calculationDurationMs.toFixed(2)}ms`);
+    console.log(' Two-Pass Algorithm Test Results:');
+    console.log(` Min Distance: ${result.minDistanceKm} km`);
+    console.log(` Time of Closest Approach: ${result.timeOfClosestApproach?.toUTCString()}`);
+    console.log(` Risk Level: ${result.riskLevel}`);
+    console.log(` Calculation Duration: ${result.calculationDurationMs.toFixed(2)}ms`);
     
     return result;
   } catch (error) {
-    console.error('❌ Two-Pass Algorithm Test Failed:', error);
+    console.error(' Two-Pass Algorithm Test Failed:', error);
     throw error;
   }
 }

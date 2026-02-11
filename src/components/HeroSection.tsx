@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Telescope, AlertTriangle, Sun, Moon, Github, Twitter, Linkedin, Mail, Satellite } from 'lucide-react';
+import { ArrowRight, Telescope, AlertTriangle, Sun, Moon, Github, Twitter, Linkedin, Mail, Satellite, Database } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Earth3D } from './Earth3D';
 import { TypewriterTitle } from './TypewriterTitle';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-type Section = 'home' | 'problem' | 'how-it-works' | 'features';
+type Section = 'home' | 'problem' | 'how-it-works' | 'features' | 'manifest';
 
 interface HeroSectionProps {
   onNavigate?: (section: Section) => void;
@@ -13,22 +14,20 @@ interface HeroSectionProps {
 
 const footerLinks = {
   Product: [
-    { label: 'Orbit Risk Checker', href: '#' },
-    { label: 'Debris Heatmap', href: '#' },
-    { label: 'Constellation Analysis', href: '#' },
-    { label: 'API Access', href: '#' },
+    { label: 'Orbit Risk Checker', href: '/orbit-risk' },
+    { label: 'SATCAT Registry', href: '/satcat' },
+    { label: 'Reentry Watch', href: '/reentry-watch' },
+    { label: 'Analytics', href: '/admin/analytics' },
   ],
   Resources: [
     { label: 'Documentation', href: '#' },
-    { label: 'TLE Database', href: '#' },
+    { label: 'TLE Database', href: '/satcat' },
     { label: 'Research Papers', href: '#' },
-    { label: 'FAQ', href: '#' },
+    { label: 'FAQ', href: '/faq' },
   ],
   Company: [
-    { label: 'About Us', href: '#about' },
-    { label: 'Careers', href: '#' },
-    { label: 'Contact', href: '#' },
-    { label: 'Press Kit', href: '#' },
+    { label: 'About Us', href: '/manifest' },
+    { label: 'Contact', href: '/contact' },
   ],
 };
 
@@ -131,10 +130,11 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
               <Button 
                 size="lg" 
                 variant="outline" 
+                onClick={() => window.location.href = '/satcat'}
                 className="border-border hover:bg-muted/50 hover:border-primary/50 font-semibold group"
               >
-                <Telescope className="w-5 h-5 mr-2" />
-                Explore Space Debris
+                <Database className="w-5 h-5 mr-2" />
+                SEARCH SATCAT
               </Button>
             </div>
             
@@ -222,12 +222,12 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
                 <ul className="space-y-2">
                   {links.map((link) => (
                     <li key={link.label}>
-                      <a 
-                        href={link.href}
+                      <Link 
+                        to={link.href}
                         className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                       >
                         {link.label}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>

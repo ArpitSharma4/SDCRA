@@ -193,6 +193,14 @@ export function OrbitRiskPage() {
       
       console.log(`Analysis complete: ${newResults.closestApproachDistance} km at ${newResults.timeOfClosestApproach}`);
       
+      // Scroll to results after analysis
+      setTimeout(() => {
+        const resultsElement = document.getElementById('analysis-results');
+        if (resultsElement) {
+          resultsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+      
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Analysis failed';
       setError(errorMessage);
@@ -474,6 +482,7 @@ export function OrbitRiskPage() {
           {/* Results Panel */}
           {showResults && analysisResults && (
             <motion.div
+              id="analysis-results"
               variants={resultsContainerVariants}
               initial="hidden"
               animate="show"

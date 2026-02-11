@@ -12,9 +12,12 @@ import { trackPageView } from "@/lib/analytics";
 
 // Lazy load pages to reduce initial bundle size
 const OrbitRiskPage = lazy(() => import("./pages/OrbitRiskPage"));
-const AboutPage = lazy(() => import("./pages/AboutPage"));
+const AboutPage = lazy(() => import("./pages/Manifest"));
 const AnalyticsDashboardPage = lazy(() => import("./pages/AnalyticsDashboardPage"));
 const ReentryWatchPage = lazy(() => import("./pages/ReentryWatchPage"));
+const SatcatPage = lazy(() => import("./pages/SatcatPage"));
+const Contact = lazy(() => import("./pages/Contact"));
+const FaqPage = lazy(() => import("./pages/FaqPage"));
 
 const queryClient = new QueryClient();
 
@@ -33,8 +36,8 @@ const AppWithNavigation = () => {
       navigate('/orbit-risk');
     } else if (section === 'reentry') {
       navigate('/reentry-watch');
-    } else if (section === 'about') {
-      navigate('/about');
+    } else if (section === 'manifest') {
+      navigate('/manifest');
     } else {
       navigate(`#${section}`);
     }
@@ -44,7 +47,7 @@ const AppWithNavigation = () => {
   const activeSection = useMemo(() => {
     if (location.pathname === '/orbit-risk') return 'problem';
     if (location.pathname === '/reentry-watch') return 'reentry';
-    if (location.pathname === '/about') return 'about';
+    if (location.pathname === '/manifest') return 'manifest';
     return (location.hash.replace('#', '') || 'home') as any;
   }, [location.pathname, location.hash]);
 
@@ -66,9 +69,12 @@ const AppWithNavigation = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/orbit-risk" element={<OrbitRiskPage />} />
-            <Route path="/about" element={<AboutPage />} />
+            <Route path="/manifest" element={<AboutPage />} />
             <Route path="/admin/analytics" element={<AnalyticsDashboardPage />} />
             <Route path="/reentry-watch" element={<ReentryWatchPage />} />
+            <Route path="/satcat" element={<SatcatPage />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/faq" element={<FaqPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

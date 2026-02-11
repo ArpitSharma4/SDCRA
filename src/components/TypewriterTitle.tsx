@@ -68,7 +68,7 @@ export const TypewriterTitle: React.FC<TypewriterTitleProps> = ({
   return (
     <div key={restartKey} className={`font-mono ${className}`}>
       {lines.map((line, lineIndex) => (
-        <div key={`${lineIndex}-${restartKey}`} className="overflow-hidden">
+        <div key={`${lineIndex}-${restartKey}`} className="overflow-hidden flex items-center">
           <motion.h1
             initial={{ width: 0 }}
             animate={{ 
@@ -88,50 +88,31 @@ export const TypewriterTitle: React.FC<TypewriterTitleProps> = ({
           >
             {lineIndex < currentLineIndex ? line : 
              lineIndex === currentLineIndex ? line.slice(0, currentCharIndex) : ''}
-            
-            {/* Blinking cursor */}
-            <AnimatePresence>
-              {lineIndex === currentLineIndex && 
-               currentCharIndex < line.length && 
-               showCursor && (
-                <motion.span
-                  initial={{ opacity: 1 }}
-                  animate={{ opacity: [1, 0, 1] }}
-                  exit={{ opacity: 0 }}
-                  transition={{ 
-                    duration: 0.8, 
-                    repeat: showCursor ? Infinity : 0,
-                    ease: 'easeInOut'
-                  }}
-                  className="inline-block ml-1"
-                >
-                  |
-                </motion.span>
-              )}
-            </AnimatePresence>
-            
-            {/* Final cursor on last line */}
-            <AnimatePresence>
-              {lineIndex === currentLineIndex && 
-               lineIndex === lines.length - 1 &&
-               currentCharIndex === line.length && 
-               showCursor && (
-                <motion.span
-                  initial={{ opacity: 1 }}
-                  animate={{ opacity: [1, 0, 1] }}
-                  exit={{ opacity: 0 }}
-                  transition={{ 
-                    duration: 0.8, 
-                    repeat: showCursor ? Infinity : 0,
-                    ease: 'easeInOut'
-                  }}
-                  className="inline-block ml-1"
-                >
-                  |
-                </motion.span>
-              )}
-            </AnimatePresence>
           </motion.h1>
+          
+          {/* Blinking cursor - ONLY on final line, outside animated container */}
+          <AnimatePresence>
+            {lineIndex === currentLineIndex && 
+             lineIndex === lines.length - 1 &&
+             currentCharIndex <= line.length && 
+             showCursor && (
+              <motion.span
+                initial={{ opacity: 1 }}
+                animate={{ opacity: [1, 0, 1] }}
+                exit={{ opacity: 0 }}
+                transition={{ 
+                  duration: 0.8, 
+                  repeat: showCursor ? Infinity : 0,
+                  ease: 'easeInOut'
+                }}
+                className="inline-block ml-1 w-0.5 bg-current"
+                style={{
+                  height: '3.0em', // Increased height for better visibility
+                  alignSelf: 'center'
+                }}
+              />
+            )}
+          </AnimatePresence>
         </div>
       ))}
     </div>

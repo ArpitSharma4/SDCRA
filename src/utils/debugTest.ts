@@ -1,6 +1,6 @@
 // Debug test function to check Starlink TLE parsing
 export async function debugTestStarlink() {
-  console.log('🚀 Starting Starlink debug test...');
+  console.log(' Starting Starlink debug test...');
   
   try {
     // Test direct URL fetch
@@ -8,18 +8,18 @@ export async function debugTestStarlink() {
     const response = await fetch('https://celestrak.org/NORAD/elements/starlink.txt');
     
     if (!response.ok) {
-      console.error('❌ Failed to fetch Starlink data:', response.status, response.statusText);
+      console.error(' Failed to fetch Starlink data:', response.status, response.statusText);
       return;
     }
     
     const text = await response.text();
-    console.log(`✅ Fetched ${text.length} characters of Starlink data`);
+    console.log(` Fetched ${text.length} characters of Starlink data`);
     
     // Look for test IDs
     const testIds = ['44235', '44238', '51057'];
     
     for (const testId of testIds) {
-      console.log(`🔍 Searching for NORAD ${testId}...`);
+      console.log(` Searching for NORAD ${testId}...`);
       
       // Search for the ID in the raw text
       const foundInText = text.includes(testId);
@@ -46,16 +46,16 @@ export async function debugTestStarlink() {
       }
     }
     
-    console.log('✅ Debug test completed');
+    console.log(' Debug test completed');
     
   } catch (error) {
-    console.error('❌ Debug test failed:', error);
+    console.error(' Debug test failed:', error);
   }
 }
 
 // Test the parsing function directly
 export async function debugTestParsing() {
-  console.log('🧪 Testing parsing function...');
+  console.log(' Testing parsing function...');
   
   try {
     // Import the parse function (we'll need to make it exportable)
@@ -74,13 +74,13 @@ export async function debugTestParsing() {
     for (const testId of testIds) {
       const tle = tleMap.get(testId);
       if (tle) {
-        console.log(`✅ Found ${testId}: ${tle.name}`);
+        console.log(` Found ${testId}: ${tle.name}`);
       } else {
-        console.log(`❌ Missing ${testId}`);
+        console.log(` Missing ${testId}`);
       }
     }
     
   } catch (error) {
-    console.error('❌ Parsing test failed:', error);
+    console.error(' Parsing test failed:', error);
   }
 }
