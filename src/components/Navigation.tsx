@@ -126,7 +126,7 @@ export function Navigation({ onNavigate, activeSection, brandName = "SDCRA" }: N
           transition={{ duration: 0.3 }}
           className="lg:hidden overflow-hidden"
         >
-          <div className="bg-slate-950/90 backdrop-blur-xl border-b border-cyan-500/20 shadow-2xl">
+          <div className="bg-slate-100/10 backdrop-blur-xl border-b border-cyan-500/10 shadow-[0_0_20px_rgba(6,182,212,0.05)]">
             <div className="px-4 pt-4 pb-6 space-y-2">
               {navItems.map((item) => (
                 <button
