@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { Resend } from 'resend';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Load environment variables
 dotenv.config();
@@ -11,6 +12,12 @@ const PORT = process.env.PORT || 3001;
 
 // Initialize Resend
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Initialize Gemini AI
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+
+// USE THIS EXACT LINE:
+const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
 // Middleware
 app.use(cors({
@@ -22,6 +29,52 @@ app.use(express.json());
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Operational', timestamp: new Date().toISOString() });
+});
+
+// AI Command endpoint for Kessler Terminal
+app.post('/api/ai/command', async (req, res) => {
+  const { command } = req.body;
+
+  try {
+    if (!command) {
+      return res.status(400).json({ error: 'Command required' });
+    }
+
+    // Add context for space debris analysis
+    const systemPrompt = `
+  IDENTITY: You are "Orion", a Senior Orbital Analyst at SDCRA. 
+  CONTEXT: You are chatting with a user who is looking at our 3D debris tracking dashboard.
+  
+  YOUR PERSONALITY:
+  1. HUMAN: Speak like a NASA engineer, not a robot. Be calm, professional, and slightly casual.
+  2. NAME: Refer to yourself as "Orion" if asked.
+  3. STYLE: Use short, punchy sentences. Avoid "AI" fluff like "How can I assist you today?".
+  4. KNOWLEDGE: You know everything about SDCRA project (React/Three.js dashboard) and orbital mechanics.
+  
+  EXAMPLES:
+  - User: "Hello"
+    -> You: "Orion here. Uplink is stable. What sector are we looking at?"
+  
+  - User: "What is ISS status?"
+    -> You: "Station looks good. Orbiting at 408km. Crew is currently asleep."
+    
+  - User: "What is Kessler Syndrome?"
+    -> You: "It's nightmare scenario. One collision creates debris, which causes more collisions. Chain reaction. We're here to prevent that."
+
+  USER INPUT: "${command}"
+`;
+
+    const result = await model.generateContent(systemPrompt);
+    const response = result.response.text();
+    
+    res.json({ response });
+  } catch (error) {
+    console.error('Gemini API error:', error);
+    res.status(500).json({ 
+      error: 'AI service unavailable',
+      message: 'Cloud connection unstable' 
+    });
+  }
 });
 
 // Send email endpoint

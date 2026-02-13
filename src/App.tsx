@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { Navigation } from "@/components/Navigation";
 import { trackPageView } from "@/lib/analytics";
+import { KesslerTerminal } from "@/components/ui/KesslerTerminal";
 
 // Lazy load pages to reduce initial bundle size
 const OrbitRiskPage = lazy(() => import("./pages/OrbitRiskPage"));
@@ -94,6 +95,7 @@ const App = () => (
       <BrowserRouter>
         <Analytics />
         <AppWithNavigation />
+        <KesslerTerminal />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
