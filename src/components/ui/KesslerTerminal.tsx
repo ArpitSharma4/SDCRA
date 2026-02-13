@@ -34,6 +34,36 @@ export const KesslerTerminal: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    // Check if name exists on load
+    const savedName = sessionStorage.getItem('sdcra_user');
+    if (savedName) {
+      setMessages(prev => [...prev, { id: Date.now().toString(), text: `WELCOME BACK, COMMANDER ${savedName.toUpperCase()}.`, isUser: false, timestamp: new Date() }]);
+    }
+
+    // Listen for new logins (real-time)
+    const handleLogin = (e: any) => {
+      const newName = e.detail;
+      setMessages(prev => [
+        ...prev, 
+        { id: Date.now().toString(), text: `BIOMETRIC SCAN COMPLETE.`, isUser: false, timestamp: new Date() },
+        { id: (Date.now() + 1).toString(), text: `Greetings, Commander ${newName}. Clearance Level 4 granted.`, isUser: false, timestamp: new Date() }
+      ]);
+    };
+
+    const handleLogout = () => {
+      setMessages(prev => [...prev, { id: Date.now().toString(), text: 'SESSION TERMINATED. USER LOGGED OUT.', isUser: false, timestamp: new Date() }]);
+    };
+
+    window.addEventListener('USER_LOGIN', handleLogin);
+    window.addEventListener('USER_LOGOUT', handleLogout);
+    
+    return () => {
+      window.removeEventListener('USER_LOGIN', handleLogin);
+      window.removeEventListener('USER_LOGOUT', handleLogout);
+    };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isThinking) return;
@@ -127,7 +157,7 @@ export const KesslerTerminal: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-80 bg-slate-950 border border-cyan-500/30 backdrop-blur-md shadow-2xl shadow-cyan-500/10">
+    <div className="fixed bottom-6 right-6 z-50 w-96 bg-slate-950 border border-cyan-500/30 backdrop-blur-md shadow-2xl shadow-cyan-500/10">
       {/* Header */}
       <div className={`p-3 border-b flex items-center justify-between ${
         mode === 'CLOUD' 

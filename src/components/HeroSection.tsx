@@ -5,6 +5,7 @@ import { Earth3D } from './Earth3D';
 import { TypewriterTitle } from './TypewriterTitle';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import IdentityScanner from './hero/IdentityScanner';
 
 type Section = 'home' | 'problem' | 'how-it-works' | 'features' | 'manifest';
 
@@ -110,55 +111,18 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
             Turning orbital data into collision-free futures.
           </motion.p>
 
-          {/* CTA Buttons and Toggle */}
+          {/* CTA Section with Identity Scanner */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center gap-4"
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="flex flex-col gap-6 mt-8"
           >
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                size="lg" 
-                onClick={() => onNavigate?.('problem')}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 font-semibold group"
-              >
-                <AlertTriangle className="w-5 h-5 mr-2" />
-                Check Orbit Risk
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                onClick={() => window.location.href = '/satcat'}
-                className="border-border hover:bg-muted/50 hover:border-primary/50 font-semibold group"
-              >
-                <Database className="w-5 h-5 mr-2" />
-                SEARCH SATCAT
-              </Button>
-                          </div>
+            <IdentityScanner />
             
-            {/* Day/Night Toggle - Moved next to CTA buttons */}
-            <div className="flex items-center gap-2 ml-0 sm:ml-4">
-              <span className="text-sm font-medium text-muted-foreground">View:</span>
-              <button
-                onClick={() => setIsNightMode(prev => !prev)}
-                className="flex items-center gap-2 px-4 py-2 bg-background/80 backdrop-blur-sm rounded-full border border-border shadow-lg hover:bg-accent/30 transition-colors"
-                aria-label={isNightMode ? 'Switch to Day Mode' : 'Switch to Night Mode'}
-              >
-                {isNightMode ? (
-                  <>
-                    <Sun className="h-4 w-4 text-yellow-400" />
-                    <span className="text-sm font-medium">Day</span>
-                  </>
-                ) : (
-                  <>
-                    <Moon className="h-4 w-4 text-blue-300" />
-                    <span className="text-sm font-medium">Night</span>
-                  </>
-                )}
-              </button>
-            </div>
+            <p className="text-slate-500 text-xs font-mono">
+              * DATA PERSISTS FOR SESSION DURATION ONLY. NO CLOUD STORAGE.
+            </p>
           </motion.div>
 
         </div>
