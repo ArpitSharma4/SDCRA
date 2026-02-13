@@ -3,8 +3,14 @@ import { Facehash } from 'facehash';
 import { Scan, ShieldCheck, ChevronRight, AlertTriangle, Lock } from 'lucide-react';
 
 const IdentityScanner = () => {
-  const [name, setName] = useState('');
-  const [isLocked, setIsLocked] = useState(false);
+  const [name, setName] = useState(() => {
+    // Check sessionStorage immediately on component creation
+    return sessionStorage.getItem('sdcra_user') || '';
+  });
+  const [isLocked, setIsLocked] = useState(() => {
+    // Check if user is already logged in
+    return !!sessionStorage.getItem('sdcra_user');
+  });
   const [randomHash, setRandomHash] = useState('000000');
   const [isFocused, setIsFocused] = useState(false);
 
@@ -16,15 +22,6 @@ const IdentityScanner = () => {
     }, 100);
     return () => clearInterval(interval);
   }, [isLocked]);
-
-  // Check for existing session on mount
-  useEffect(() => {
-    const savedName = sessionStorage.getItem('sdcra_user');
-    if (savedName) {
-      setName(savedName);
-      setIsLocked(true);
-    }
-  }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
