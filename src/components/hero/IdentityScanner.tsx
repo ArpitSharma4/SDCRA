@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Avatar from 'boring-avatars';
+import { Facehash } from 'facehash';
 import { Scan, ShieldCheck, ChevronRight, AlertTriangle, Lock } from 'lucide-react';
 
 const IdentityScanner = () => {
@@ -54,12 +54,11 @@ const IdentityScanner = () => {
           
           {/* 2. THE FACE HASH (Updates as you type) */}
           <div className="relative shrink-0">
-            <div className={`w-16 h-16 rounded-full overflow-hidden border-2 ${isLocked ? 'border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)]' : 'border-cyan-500/50'} transition-all duration-300 bg-black`}>
-               <Avatar
-                 size={64}
-                 name={name || "SDCRA-GUEST"} 
-                 variant="beam" 
-                 colors={['#0e7490', '#06b6d4', '#22d3ee', '#67e8f9', '#ecfeff']}
+            <div className={`w-16 h-16 overflow-hidden border-2 ${isLocked ? 'border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)]' : 'border-cyan-500/50'} transition-all duration-300 bg-gradient-to-br from-cyan-900 via-blue-900 to-purple-900`}>
+               <Facehash 
+                 name={name || "SDCRA-GUEST"}
+                 colors={['#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b']}
+                 style={{ width: '100%', height: '100%', display: 'block' }}
                />
             </div>
             {/* Status Dot */}
