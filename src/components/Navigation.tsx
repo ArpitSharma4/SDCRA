@@ -22,12 +22,23 @@ export function Navigation({ onNavigate, activeSection, brandName = "SDCRA" }: N
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // 1. ADVANCED SCROLL DETECTION (Fixes "Wrapper" Bug)
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+    const handleScroll = (e: Event) => {
+      let scrollValue = window.scrollY;
+
+      // If a specific div is scrolling (not the window), grab its scroll value
+      if (e.target instanceof HTMLElement && (e.target as HTMLElement).scrollTop > 0) {
+        scrollValue = (e.target as HTMLElement).scrollTop;
+      }
+
+      setIsScrolled(scrollValue > 20);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    // { capture: true } is magic. It listens to ALL scroll events on the page.
+    window.addEventListener('scroll', handleScroll, { capture: true });
+    
+    return () => window.removeEventListener('scroll', handleScroll, { capture: true });
   }, []);
 
   return (
@@ -35,8 +46,10 @@ export function Navigation({ onNavigate, activeSection, brandName = "SDCRA" }: N
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'glass-strong shadow-lg' : 'bg-transparent'
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${
+        isScrolled 
+          ? 'bg-slate-100/10 backdrop-blur-xl border-cyan-500/10 shadow-[0_0_20px_rgba(6,182,212,0.05)]' // MUCH LIGHTER GLASS
+          : 'bg-transparent border-transparent'
       }`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -113,27 +126,29 @@ export function Navigation({ onNavigate, activeSection, brandName = "SDCRA" }: N
           transition={{ duration: 0.3 }}
           className="lg:hidden overflow-hidden"
         >
-          <div className="py-4 space-y-2">
-            {navItems.map((item) => (
-              <button
-                key={item.label}
-                onClick={() => {
-                  onNavigate(item.section);
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`block w-full text-left px-4 py-3 text-lg font-medium rounded-lg transition-colors ${
-                  activeSection === item.section 
-                    ? 'bg-accent/20 text-foreground' 
-                    : 'text-foreground/80 hover:bg-accent/10'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-            <div className="pt-4 px-4">
-              <Button className="w-full bg-primary text-primary-foreground">
-                Launch App
-              </Button>
+          <div className="bg-slate-950/90 backdrop-blur-xl border-b border-cyan-500/20 shadow-2xl">
+            <div className="px-4 pt-4 pb-6 space-y-2">
+              {navItems.map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => {
+                    onNavigate(item.section);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`block w-full text-left px-4 py-3 text-lg font-medium rounded-lg transition-colors ${
+                    activeSection === item.section 
+                      ? 'bg-accent/20 text-foreground' 
+                      : 'text-foreground/80 hover:bg-accent/10'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+              <div className="pt-4 px-4">
+                <Button className="w-full bg-primary text-primary-foreground">
+                  Launch App
+                </Button>
+              </div>
             </div>
           </div>
         </motion.div>
