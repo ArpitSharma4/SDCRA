@@ -92,6 +92,18 @@ export function Navigation({ onNavigate, activeSection, brandName = "SDCRA" }: N
                 />
               </motion.button>
             ))}
+            {/* Easter Egg - 404 Demo */}
+            <motion.button
+              onClick={() => window.location.href = '/demo-404'}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.3 }}
+              whileHover={{ opacity: 1 }}
+              className="relative px-2 py-2 text-xs font-mono transition-colors group bg-transparent border-none cursor-pointer text-muted-foreground/30 hover:text-cyan-500"
+              title="Try our interactive 404 page"
+            >
+              404
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-cyan-500 transition-all duration-300 w-0 group-hover:w-full" />
+            </motion.button>
           </div>
 
           {/* CTA Button */}
@@ -144,6 +156,16 @@ export function Navigation({ onNavigate, activeSection, brandName = "SDCRA" }: N
                   {item.label}
                 </button>
               ))}
+              {/* Easter Egg - 404 Demo */}
+              <button
+                onClick={() => {
+                  window.location.href = '/demo-404';
+                  setIsMobileMenuOpen(false);
+                }}
+                className="block w-full text-left px-4 py-3 text-xs font-mono rounded-lg transition-colors text-muted-foreground/30 hover:text-cyan-500 hover:bg-accent/5"
+              >
+                [EASTER EGG] Interactive 404 Demo
+              </button>
               <div className="pt-4 px-4">
                 <Button className="w-full bg-primary text-primary-foreground">
                   Launch App
