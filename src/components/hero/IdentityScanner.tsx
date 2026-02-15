@@ -65,13 +65,11 @@ const IdentityScanner = () => {
           {/* 3. THE INPUT FIELD */}
           <div className="flex-1 min-w-0 z-10">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-[10px] uppercase tracking-widest text-slate-500 font-mono flex items-center gap-1">
+              <span className="text-xs uppercase tracking-widest text-slate-500 font-mono flex items-center gap-1">
                 {isLocked ? <Lock className="w-3 h-3" /> : <Scan className="w-3 h-3" />}
                 {isLocked ? 'IDENTITY VERIFIED' : 'ENTER CALLSIGN'}
               </span>
-              <span className="text-[10px] font-mono text-cyan-500/50">
-                #{isLocked ? 'AUTH_OK' : randomHash}
-              </span>
+             
             </div>
 
             {!isLocked ? (
@@ -83,7 +81,7 @@ const IdentityScanner = () => {
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setIsFocused(false)}
                   placeholder="TYPE NAME..."
-                  className="w-full bg-transparent text-white font-bold tracking-wider outline-none placeholder:text-slate-700 font-mono text-lg uppercase"
+                  className="w-full bg-transparent text-white font-bold tracking-wider outline-none placeholder:text-slate-700 font-mono text-xl uppercase"
                   autoComplete="off"
                 />
                 <button 
@@ -96,12 +94,12 @@ const IdentityScanner = () => {
               </form>
             ) : (
               <div className="flex justify-between items-center">
-                <span className="text-xl font-bold text-white font-mono tracking-wider uppercase">
+                <span className="text-2xl font-bold text-white font-mono tracking-wider uppercase">
                   {name}
                 </span>
                 <button 
                   onClick={handleLogout}
-                  className="text-[10px] text-slate-500 hover:text-red-400 border border-slate-700 hover:border-red-500/50 px-2 py-1 rounded transition-colors uppercase tracking-widest"
+                  className="text-xs text-slate-500 hover:text-red-400 border border-slate-700 hover:border-red-500/50 px-2 py-1 rounded transition-colors uppercase tracking-widest"
                 >
                   [ RESET ]
                 </button>
@@ -115,7 +113,13 @@ const IdentityScanner = () => {
           )}
         </div>
       </div>
+      
+      {/* Privacy Protocol Disclaimer */}
+      <div className="flex items-start gap-2 text-xs font-mono">
+        <p className="text-slate-500 leading-tight">
+        </p>
       </div>
+    </div>
   );
 };
 
