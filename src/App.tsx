@@ -14,7 +14,6 @@ import { KesslerTerminal } from "@/components/ui/KesslerTerminal";
 // Lazy load pages to reduce initial bundle size
 const OrbitRiskPage = lazy(() => import("./pages/OrbitRiskPage"));
 const AboutPage = lazy(() => import("./pages/Manifest"));
-const AnalyticsDashboardPage = lazy(() => import("./pages/AnalyticsDashboardPage"));
 const ReentryWatchPage = lazy(() => import("./pages/ReentryWatchPage"));
 const SatcatPage = lazy(() => import("./pages/SatcatPage"));
 const Contact = lazy(() => import("./pages/Contact"));
@@ -72,7 +71,6 @@ const AppWithNavigation = () => {
             <Route path="/" element={<Index />} />
             <Route path="/orbit-risk" element={<OrbitRiskPage />} />
             <Route path="/manifest" element={<AboutPage />} />
-            <Route path="/admin/analytics" element={<AnalyticsDashboardPage />} />
             <Route path="/reentry-watch" element={<ReentryWatchPage />} />
             <Route path="/satcat" element={<SatcatPage />} />
             <Route path="/contact" element={<Contact />} />

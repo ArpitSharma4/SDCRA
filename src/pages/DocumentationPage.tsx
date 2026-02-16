@@ -25,7 +25,7 @@ const DocumentationPage = () => {
           {/* Back Button */}
           <Link 
             to="/" 
-            className="flex items-center gap-2 px-6 py-3 border border-slate-700 hover:border-cyan-500 hover:bg-cyan-950/30 text-slate-300 hover:text-cyan-400 transition-all uppercase tracking-wider text-sm group"
+            className="btn-glass flex items-center gap-2 px-6 py-3 text-slate-200 transition-all uppercase tracking-wider text-sm group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             Return to Command
@@ -83,7 +83,7 @@ const DocumentationPage = () => {
                 href="/docs/KESSLER_DOCUMENTATION.pdf" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-transparent border border-slate-600 hover:border-cyan-500 text-white hover:text-cyan-400 transition-all group uppercase tracking-wider text-sm"
+                className="btn-glass flex-1 flex items-center justify-center gap-2 px-6 py-4 text-slate-200 transition-all group uppercase tracking-wider text-sm"
               >
                 <Eye className="w-4 h-4" />
                 Visual Scan
@@ -91,7 +91,7 @@ const DocumentationPage = () => {
               <a 
                 href="/docs/KESSLER_DOCUMENTATION.pdf" 
                 download="SDCRA_Protocol_Manual.pdf"
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-cyan-900/10 hover:bg-cyan-900/30 border border-cyan-500/50 hover:border-cyan-400 text-cyan-400 transition-all group uppercase tracking-wider text-sm"
+                className="btn-glass flex-1 flex items-center justify-center gap-2 px-6 py-4 text-slate-200 transition-all group uppercase tracking-wider text-sm"
               >
                 <Download className="w-4 h-4 group-hover:translate-y-1 transition-transform" />
                 Extract Data

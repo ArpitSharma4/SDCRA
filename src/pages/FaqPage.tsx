@@ -1,8 +1,7 @@
 import { motion } from 'framer-motion';
-import { Database, Activity, ShieldAlert, ChevronDown, ChevronUp } from 'lucide-react';
+import { Database, Activity, ShieldAlert, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { TypewriterTitle } from '@/components/TypewriterTitle';
 
 interface FAQItem {
   question: string;
@@ -51,15 +50,15 @@ const FAQAccordion = ({ item, isOpen, onToggle }: { item: FAQItem; isOpen: boole
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="border border-cyan-900/30 rounded-lg overflow-hidden bg-slate-900/50 backdrop-blur-sm"
+      className="border border-emerald-900/25 rounded-lg overflow-hidden bg-slate-900/50 backdrop-blur-sm"
     >
       <button
         onClick={onToggle}
         className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-slate-800/50 transition-colors group"
       >
         <div className="flex items-center gap-3">
-          <Icon className="w-5 h-5 text-cyan-500 flex-shrink-0" />
-          <span className="font-mono text-cyan-400 group-hover:text-cyan-300 transition-colors">
+          <Icon className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+          <span className="font-mono text-emerald-300 group-hover:text-emerald-200 transition-colors">
             &gt; QUERY: {item.question}
           </span>
         </div>
@@ -67,7 +66,7 @@ const FAQAccordion = ({ item, isOpen, onToggle }: { item: FAQItem; isOpen: boole
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <ChevronDown className="w-4 h-4 text-cyan-500" />
+          <ChevronDown className="w-4 h-4 text-emerald-500" />
         </motion.div>
       </button>
       
@@ -80,7 +79,7 @@ const FAQAccordion = ({ item, isOpen, onToggle }: { item: FAQItem; isOpen: boole
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className="overflow-hidden"
       >
-        <div className="px-6 py-4 bg-slate-800/30 border-t border-cyan-900/20">
+        <div className="px-6 py-4 bg-slate-800/30 border-t border-emerald-900/20">
           <p className="font-mono text-slate-300 text-sm leading-relaxed">
             {item.answer}
           </p>
@@ -98,24 +97,23 @@ export default function FaqPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-cyan-500">
-      {/* Header */}
-      <div className="container mx-auto px-4 pt-32 pb-16">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <TypewriterTitle 
-            lines={['SYSTEM PROTOCOLS // KNOWLEDGE BASE']}
-            speed={50}
-            className="text-4xl md:text-6xl font-bold text-cyan-400"
-          />
-          <div className="w-24 h-1 bg-gradient-to-r from-cyan-600 to-cyan-400 mx-auto rounded-full mt-4"></div>
-        </motion.div>
+    <div className="min-h-screen bg-slate-950 text-slate-200">
+      <div className="container mx-auto px-4 pt-24 pb-16">
+        <div className="max-w-4xl mx-auto mb-6">
+          <div className="text-[11px] uppercase tracking-[0.35em] text-slate-500 font-mono">
+            Knowledge Base
+          </div>
+          <div className="mt-2 flex items-end justify-between gap-4">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-100">
+              FAQs
+            </h1>
+            <div className="hidden sm:block text-[11px] text-emerald-400/80 font-mono">
+              Status: Online
+            </div>
+          </div>
+          <div className="mt-4 h-px w-full bg-gradient-to-r from-emerald-500/25 via-slate-700/40 to-transparent" />
+        </div>
 
-        {/* FAQ Items */}
         <div className="max-w-4xl mx-auto space-y-4">
           {faqData.map((item, index) => (
             <FAQAccordion
@@ -136,7 +134,7 @@ export default function FaqPage() {
         >
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-6 py-3 border border-cyan-900/50 rounded-lg font-mono text-cyan-400 hover:bg-slate-900/50 hover:border-cyan-500/50 transition-all"
+            className="btn-glass inline-flex items-center gap-2 px-6 py-3 font-mono text-slate-200"
           >
             <span>← RETURN TO HOME</span>
           </Link>

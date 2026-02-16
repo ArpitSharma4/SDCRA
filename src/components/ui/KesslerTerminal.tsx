@@ -148,7 +148,7 @@ export const KesslerTerminal: React.FC = () => {
     return (
       <button
         onClick={toggleTerminal}
-        className="fixed bottom-6 right-6 z-50 px-4 py-2 bg-slate-900 border border-cyan-500/50 text-cyan-400 font-mono text-sm hover:bg-cyan-950/30 hover:border-cyan-400 transition-all duration-200 shadow-lg shadow-cyan-500/20 flex items-center gap-2 uppercase tracking-wider"
+        className="btn-glass fixed bottom-6 right-6 z-50 px-4 py-2 text-slate-200 font-mono text-sm uppercase tracking-wider"
       >
         <Terminal className="w-4 h-4" />
         [ ASK ORION ]
@@ -249,7 +249,7 @@ export const KesslerTerminal: React.FC = () => {
               <button
                 type="submit"
                 disabled={isThinking || !input.trim()}
-                className="p-1 bg-cyan-900/30 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-800/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="p-1 bg-slate-800/40 border border-slate-600/40 text-slate-200 hover:bg-slate-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <Send className="w-3 h-3" />
               </button>

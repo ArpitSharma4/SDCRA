@@ -111,7 +111,7 @@
       hsl(222, 47%, 6%) 100%
     );
     /* Global monospace font with legibility improvements */
-    font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+    font-family: 'JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
     font-size: 16px; /* Slightly larger base size for monospace */
     line-height: 1.6; /* Comfortable line height for readability */
     letter-spacing: 0.02em; /* Slightly increased letter spacing */
@@ -337,6 +337,39 @@
   }
   .log-scroll-inner {
     animation: log-scroll 30s linear infinite;
+  }
+
+  .btn-glass {
+    @apply relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-lg border border-slate-500/30 bg-slate-900/40 backdrop-blur-md;
+    box-shadow: 0 0 15px rgba(148, 163, 184, 0.12);
+    @apply transition-all duration-300;
+  }
+
+  .btn-glass:hover {
+    box-shadow: 0 0 25px rgba(148, 163, 184, 0.2);
+    @apply brightness-110 scale-[1.02];
+  }
+
+  .btn-glass::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -120%;
+    width: 60%;
+    height: 200%;
+    transform: rotate(25deg);
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.18) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transition: left 600ms ease;
+    pointer-events: none;
+  }
+
+  .btn-glass:hover::before {
+    left: 160%;
   }
 }
 

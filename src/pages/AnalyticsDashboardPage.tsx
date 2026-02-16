@@ -85,7 +85,7 @@ const AnalyticsDashboardPage: React.FC = () => {
                 href={dashboardUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[11px] text-cyan-300 hover:text-cyan-200"
+                className="inline-flex items-center gap-1 text-[11px] text-slate-300 hover:text-white"
               >
                 Open in new tab
                 <ExternalLink className="w-3 h-3" />
@@ -103,7 +103,7 @@ const AnalyticsDashboardPage: React.FC = () => {
             </div>
           ) : (
             <div className="bg-slate-900/70 border border-cyan-500/20 rounded-lg p-4 text-xs text-slate-300 space-y-2">
-              <p className="text-cyan-200">
+              <p className="text-slate-200">
                 No external dashboard configured yet.
               </p>
               <ul className="list-disc list-inside space-y-1 text-slate-400">

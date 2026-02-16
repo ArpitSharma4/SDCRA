@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Menu, X, Satellite } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import LaunchThruster from '@/components/ui/LaunchThruster';
 
 type Section = 'home' | 'problem' | 'manifest' | 'reentry' | 'features';
 
@@ -18,7 +18,7 @@ const navItems = [
   { label: 'Manifest', section: 'manifest' as const },
 ];
 
-export function Navigation({ onNavigate, activeSection, brandName = "SDCRA" }: NavigationProps) {
+export function Navigation({ onNavigate, activeSection, brandName = "KESSLER" }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -108,13 +108,7 @@ export function Navigation({ onNavigate, activeSection, brandName = "SDCRA" }: N
 
           {/* CTA Button */}
           <div className="hidden lg:block">
-            <Button 
-              variant="default" 
-              size="sm"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
-            >
-              Launch App
-            </Button>
+            <LaunchThruster />
           </div>
 
           {/* Mobile Menu Button */}
@@ -167,9 +161,9 @@ export function Navigation({ onNavigate, activeSection, brandName = "SDCRA" }: N
                 [EASTER EGG] Interactive 404 Demo
               </button>
               <div className="pt-4 px-4">
-                <Button className="w-full bg-primary text-primary-foreground">
-                  Launch App
-                </Button>
+                <div className="flex justify-center">
+                  <LaunchThruster />
+                </div>
               </div>
             </div>
           </div>

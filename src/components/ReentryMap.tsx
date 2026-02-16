@@ -225,13 +225,20 @@ export const ReentryMap: React.FC<ReentryMapProps> = ({ tle1, tle2, satelliteNam
       ref={containerRef}
       className="relative w-full h-full min-h-[260px] rounded-md overflow-hidden bg-slate-950 border border-slate-800"
     >
-      {/* World map background (dark equirectangular) */}
+      {/* World map background (NASA Black Marble - tactical mission control styling) */}
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-30"
+        className="absolute inset-0 z-0 opacity-50 pointer-events-none"
         style={{
-          backgroundImage: "url('/BlackMarble_2016_global_7km_print.jpg')",
+          backgroundImage: `url('https://eoimages.gsfc.nasa.gov/images/imagerecords/79000/79765/dnb_land_ocean_ice.2012.3600x1800.jpg')`,
+          backgroundSize: '100% 100%',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          filter: 'grayscale(100%) contrast(1.2) brightness(0.6)'
         }}
       />
+
+      {/* Subtle grid overlay behind chart line */}
+      <div className="absolute inset-0 z-0 opacity-10 bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
       <canvas
         ref={canvasRef}

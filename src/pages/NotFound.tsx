@@ -14,7 +14,7 @@ const NotFound = () => {
 
     let particles: Particle[] = [];
     let animationFrameId: number;
-    let mouse = { x: -1000, y: -1000, radius: 100 };
+    let mouse = { x: -1000, y: -1000, radius: 150 };
 
     // Set canvas size
     const handleResize = () => {
@@ -100,9 +100,10 @@ const NotFound = () => {
       const textCoordinates = ctx.getImageData(0, 0, canvas.width, canvas.height);
       
       // Create particles only where the text is
-      // (Skip pixels for performance - step 10 or 15)
-      for (let y = 0, y2 = textCoordinates.height; y < y2; y += 15) {
-        for (let x = 0, x2 = textCoordinates.width; x < x2; x += 15) {
+      // (Skip pixels for performance - step 20 for mobile)
+      const stepSize = window.innerWidth < 768 ? 20 : 15;
+      for (let y = 0, y2 = textCoordinates.height; y < y2; y += stepSize) {
+        for (let x = 0, x2 = textCoordinates.width; x < x2; x += stepSize) {
           // Check alpha value (4th byte)
           if (textCoordinates.data[(y * 4 * textCoordinates.width) + (x * 4) + 3] > 128) {
             particles.push(new Particle(x, y));
@@ -121,20 +122,29 @@ const NotFound = () => {
       animationFrameId = requestAnimationFrame(animate);
     };
 
-    // Mouse Listeners
+    // Mouse & Touch Listeners
     const onMouseMove = (e: MouseEvent) => {
-      mouse.x = e.x;
-      mouse.y = e.y;
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        mouse.x = e.touches[0].clientX;
+        mouse.y = e.touches[0].clientY;
+      }
     };
 
     init();
     animate();
 
     window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('touchmove', onTouchMove);
 
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('touchmove', onTouchMove);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
@@ -157,7 +167,7 @@ const NotFound = () => {
         <div className="mt-96 pointer-events-auto flex gap-6 justify-center">
           <Link 
             to="/" 
-            className="group flex items-center gap-2 bg-cyan-950/30 hover:bg-cyan-900/40 text-cyan-400 border border-cyan-500/30 px-6 py-3 rounded backdrop-blur-sm transition-all hover:scale-105"
+            className="btn-glass group flex items-center gap-2 text-slate-200 px-6 py-3"
           >
             <Home className="w-4 h-4" />
             <span className="font-mono text-sm tracking-widest font-bold">RETURN TO ORBIT</span>
@@ -165,7 +175,7 @@ const NotFound = () => {
 
           <button 
             onClick={() => window.location.reload()}
-            className="group flex items-center gap-2 bg-slate-800/30 hover:bg-slate-700/40 text-slate-400 border border-slate-700/50 px-6 py-3 rounded backdrop-blur-sm transition-all hover:text-white"
+            className="btn-glass group flex items-center gap-2 text-slate-200 px-6 py-3 hover:text-white"
           >
             <RefreshCcw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
             <span className="font-mono text-sm tracking-widest font-bold">RETRY SIGNAL</span>

@@ -316,10 +316,10 @@ export const RadarDisplay: React.FC<RadarDisplayProps> = ({
       />
       
       {/* Cardinal directions - clean sans-serif on edge */}
-      <div className="absolute top-1 left-1/2 -translate-x-1/2 text-white/80 text-xs font-sans tracking-wider">N</div>
-      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-white/80 text-xs font-sans tracking-wider">S</div>
-      <div className="absolute left-1 top-1/2 -translate-y-1/2 text-white/80 text-xs font-sans tracking-wider">W</div>
-      <div className="absolute right-1 top-1/2 -translate-y-1/2 text-white/80 text-xs font-sans tracking-wider">E</div>
+      <div className="absolute top-1 left-1/2 -translate-x-1/2 text-white/80 text-xs tracking-wider">N</div>
+      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-white/80 text-xs tracking-wider">S</div>
+      <div className="absolute left-1 top-1/2 -translate-y-1/2 text-white/80 text-xs tracking-wider">W</div>
+      <div className="absolute right-1 top-1/2 -translate-y-1/2 text-white/80 text-xs tracking-wider">E</div>
     </div>
   );
 };

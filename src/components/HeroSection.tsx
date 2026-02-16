@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Telescope, AlertTriangle, Sun, Moon, Github, Twitter, Linkedin, Mail, Satellite, Database, FileText } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ArrowRight, Telescope, Sun, Moon, Github, Twitter, Linkedin, Mail, Satellite, Database, FileText } from 'lucide-react';
 import { Earth3D } from './Earth3D';
 import { TypewriterTitle } from './TypewriterTitle';
 import { useState } from 'react';
@@ -18,7 +17,6 @@ const footerLinks = {
     { label: 'Orbit Risk Checker', href: '/orbit-risk' },
     { label: 'SATCAT Registry', href: '/satcat' },
     { label: 'Reentry Watch', href: '/reentry-watch' },
-    { label: 'Analytics', href: '/admin/analytics' },
   ],
   Resources: [
     { label: 'Documentation', href: '/documentation' },
@@ -92,9 +90,9 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
             <div className="min-h-[280px] flex flex-col justify-center">
               <TypewriterTitle 
                 lines={[
-                  'Space Debris',
-                  'Collision Risk', 
-                  'Analyser'
+                  'SPACE DEBRIS',
+                  'COLLISION RISK', 
+                  'ANALYSER'
                 ]}
                 speed={50}
               />
@@ -154,15 +152,12 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
             viewport={{ once: true }}
             className="bg-background/80 backdrop-blur-sm border border-border/50 rounded-lg p-4 mb-12 max-w-4xl mx-auto"
           >
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 mt-0.5 text-yellow-500 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold text-foreground mb-1">Disclaimer</h3>
-                <p className="text-sm text-muted-foreground">
-                  This tool provides estimates based on available orbital data. Actual collision risks may vary. 
-                  For mission-critical decisions, please consult with orbital safety experts.
-                </p>
-              </div>
+            <div>
+              <h3 className="font-semibold text-foreground mb-1">DISCLAIMER</h3>
+              <p className="text-sm text-muted-foreground">
+                This tool provides estimates based on available orbital data. Actual collision risks may vary. 
+                For mission-critical decisions, please consult with orbital safety experts.
+              </p>
             </div>
           </motion.div>
 

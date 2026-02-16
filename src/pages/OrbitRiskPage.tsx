@@ -1,18 +1,16 @@
 import { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AlertTriangle, Satellite, Activity, Wifi, WifiOff, Ruler, Clock, CheckCircle2, MapPin, Zap, Cloud, Radio } from 'lucide-react';
+import { Wifi, WifiOff, Play, Terminal, Search } from 'lucide-react';
 import { Earth3D } from '@/components/Earth3D';
 import { OrbitalHUD } from '@/components/OrbitalHUD';
-import { useNavigate } from 'react-router-dom';
 import React from 'react';
-import { findClosestApproach, getSatellitePosition, generateOrbitPath, getSatelliteCategory, clearTLECache, fetchTLEGroup, getRandomSatellitesFromGroup } from '@/utils/satelliteUtils';
+import { getSatellitePosition, generateOrbitPath, getSatelliteCategory } from '@/utils/satelliteUtils';
 import { analyzeConjunction, ConjunctionResult } from '@/utils/orbitalMath';
 import * as satellite from 'satellite.js';
-import { SATELLITE_GROUPS, getSatelliteGroupOptions, DEFAULT_SATELLITE_GROUP, SatelliteGroup } from '@/config/satelliteGroups';
+import { getSatelliteGroupOptions, DEFAULT_SATELLITE_GROUP } from '@/config/satelliteGroups';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useSatelliteData } from '@/hooks/useSatelliteData';
 import { Badge } from '@/components/ui/badge';
@@ -20,8 +18,6 @@ import { Badge } from '@/components/ui/badge';
 export function OrbitRiskPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const [isNightMode, setIsNightMode] = useState(false);
-  const navigate = useNavigate();
   
   // Form states
   const [satellite1, setSatellite1] = useState('');
@@ -43,35 +39,44 @@ export function OrbitRiskPage() {
   // Track if user is manually editing to prevent auto-selection override
   const [userIsEditing, setUserIsEditing] = useState(false);
 
-  const testServerlessAccess = useCallback(async () => {
-    console.log('🧪 Testing direct Celestrak access from browser...');
-    
+  const getCurrentSatelliteDetails = useCallback((noradId: string) => {
+    if (!noradId) return null;
+    const tle = satelliteData.satellites.get(noradId);
+    if (!tle) return null;
+
+    const category = getSatelliteCategory(noradId, tle.name);
+
+    let inclinationDeg: number | null = null;
+    let altitudeKm: number | null = null;
+
     try {
-      // Test direct access from browser (same as you're doing manually)
-      const testUrl = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=stations&FORMAT=tle';
-      
-      const response = await fetch(testUrl, {
-        method: 'GET',
-        headers: {
-          'Accept': 'text/plain, */*',
-        }
-      });
-      
-      console.log('📊 Browser test result:', response.status);
-      
-      if (response.ok) {
-        const text = await response.text();
-        const satelliteCount = text.split('\n').filter(line => line.trim().startsWith('1 ')).length;
-        
-        alert(`✅ Browser Access Works!\n\nStatus: ${response.status}\nSatellites: ${satelliteCount}\n\nThis confirms Celestrak is accessible.\nThe issue is likely with the proxy/serverless setup.`);
-      } else {
-        alert(`❌ Browser Access Failed!\n\nStatus: ${response.status}\n${response.statusText}\n\nThis is unexpected since you can access it manually.`);
+      const satrec = satellite.twoline2satrec(tle.tle1, tle.tle2);
+      inclinationDeg = (satrec.inclo * 180) / Math.PI;
+
+      const now = new Date();
+      const propagated = satellite.propagate(satrec, now);
+      const pos = propagated.position;
+      if (pos && typeof pos !== 'boolean') {
+        const x = (pos as satellite.EciVec3<number>).x;
+        const y = (pos as satellite.EciVec3<number>).y;
+        const z = (pos as satellite.EciVec3<number>).z;
+        const rKm = Math.sqrt(x * x + y * y + z * z);
+        altitudeKm = rKm - 6371;
       }
-    } catch (error) {
-      console.error('Test failed:', error);
-      alert(`❌ Test failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } catch {
+      // Ignore parsing/propagation errors; UI will show nulls
     }
-  }, []);
+
+    return {
+      name: tle.name as string,
+      category,
+      inclinationDeg,
+      altitudeKm,
+    };
+  }, [satelliteData.satellites]);
+
+  const satellite1Details = getCurrentSatelliteDetails(satellite1);
+  const satellite2Details = getCurrentSatelliteDetails(satellite2);
 
   const handleAnalyzeRisk = useCallback(async () => {
     if (!satellite1 || !satellite2) {
@@ -141,14 +146,14 @@ export function OrbitRiskPage() {
       const orbit2Path = generateOrbitPath(tle2.tle1, tle2.tle2, timeframeHours);
 
       // Determine risk level using Two-Pass results
-      let riskLevel = 'Low';
+      let riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' = conjunctionResult.riskLevel;
       let riskReasons = [];
       
       if (conjunctionResult.minDistanceKm < 1) {
-        riskLevel = 'High';
+        riskLevel = 'HIGH';
         riskReasons.push('Miss distance < 1 km');
       } else if (conjunctionResult.minDistanceKm < 5) {
-        riskLevel = 'Medium';
+        riskLevel = 'MEDIUM';
         riskReasons.push('Miss distance < 5 km');
       } else {
         riskReasons.push('Miss distance > 5 km');
@@ -216,10 +221,6 @@ export function OrbitRiskPage() {
     }
   }, [satellite1, satellite2, timeframe]);
 
-  const toggleNightMode = React.useCallback(() => {
-    setIsNightMode(prev => !prev);
-  }, []);
-
   const clearResults = React.useCallback(() => {
     setShowResults(false);
     setAnalysisResults(null);
@@ -231,11 +232,13 @@ export function OrbitRiskPage() {
   }, []);
 
   const handleSatellite1Change = useCallback((value: string) => {
+    setUserIsEditing(true);
     setSatellite1(value);
     clearResults();
   }, [clearResults]);
 
   const handleSatellite2Change = useCallback((value: string) => {
+    setUserIsEditing(true);
     setSatellite2(value);
     clearResults();
   }, [clearResults]);
@@ -260,49 +263,25 @@ export function OrbitRiskPage() {
     // The hook will automatically load data and we'll auto-select when ready
   }, [clearResults]);
 
-  const resultsContainerVariants = {
-    hidden: { opacity: 0, y: 16 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: { staggerChildren: 0.12 }
-    }
-  };
-
-  const resultsItemVariants = {
-    hidden: { opacity: 0, y: 16 },
-    show: { opacity: 1, y: 0 }
-  };
-
-  // Auto-select first two satellites when data is loaded or category changes
+  // Auto-select first two satellites when data is loaded (only if inputs are empty)
   useEffect(() => {
-  // 1. STOP if data is still loading (prevents selecting old satellites)
-  if (satelliteData.isLoading) return;
+    // 1. STOP if data is still loading
+    if (satelliteData.isLoading) return;
 
-  // 2. STOP if user is manually editing
-  if (userIsEditing) return;
+    // 2. STOP if user is manually editing
+    if (userIsEditing) return;
 
-  // 3. STOP if we don't have enough satellites to select
-  if (satelliteData.satellites.size < 2) return;
+    // 3. STOP if we don't have enough satellites to select
+    if (satelliteData.satellites.size < 2) return;
 
-  // 4. Only auto-select if inputs are empty OR invalid for the current category
-  const isSat1Valid = satellite1 && satelliteData.satellites.has(satellite1);
-  const isSat2Valid = satellite2 && satelliteData.satellites.has(satellite2);
-
-  if (!isSat1Valid || !isSat2Valid) {
-    const ids = Array.from(satelliteData.satellites.keys());
-    setSatellite1(ids[0]);
-    setSatellite2(ids[1]);
-    console.log(`Auto-selected satellites: ${ids[0]} and ${ids[1]}`);
-  }
-}, [satelliteData.satellites, satelliteData.isLoading, satellite1, satellite2, userIsEditing]); // Include selectedCategory
-
-  // Get available satellite IDs for placeholder
-  const getAvailableSatelliteIds = () => {
-    if (satelliteData.satellites.size === 0) return 'Loading...';
-    const ids = Array.from(satelliteData.satellites.keys()).slice(0, 5);
-    return ids.join(', ') + (satelliteData.satellites.size > 5 ? '...' : '');
-  };
+    // 4. Only auto-select if BOTH inputs are completely empty
+    if (!satellite1 && !satellite2) {
+      const ids = Array.from(satelliteData.satellites.keys());
+      setSatellite1(ids[0]);
+      setSatellite2(ids[1]);
+      console.log(`Auto-selected satellites: ${ids[0]} and ${ids[1]}`);
+    }
+  }, [satelliteData.satellites, satelliteData.isLoading, satellite1, satellite2, userIsEditing]);
 
   // Load default satellite category on component mount
   useEffect(() => {
@@ -310,67 +289,56 @@ export function OrbitRiskPage() {
   }, []); // Only run once on mount
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden flex flex-col">
-      <main className="flex-grow flex flex-col">
-        {/* Header */}
-        <div className="border-b border-border/50 bg-background/80 backdrop-blur-sm mt-8">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            {/* Empty header - just for visual separation */}
-          </div>
-        </div>
-
-      {/* Main Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="min-h-screen bg-slate-950 text-slate-300 overflow-hidden font-mono pt-16 lg:pt-20">
+      {/* Main Content - Three Column Layout */}
+      <div className="container mx-auto px-4 py-4 h-[calc(100vh-64px)] lg:h-[calc(100vh-80px)]">
+        <div className="grid grid-cols-12 gap-4 h-full">
           
-          {/* Input Panel */}
+          {/* Left Panel - Target & Live Feed (25% width) */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6 }}
+            className="col-span-3 space-y-3"
           >
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Satellite className="h-5 w-5 text-primary" />
-                  Input Parameters
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            {/* Target Input */}
+            <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-lg p-3">
+              <h3 className="text-xs font-bold tracking-wider text-cyan-400 uppercase mb-2">Target Acquisition</h3>
+              <div className="space-y-3">
                 <div>
-                  <Label htmlFor="category" className="text-xs tracking-wider font-semibold text-muted-foreground uppercase">Satellite Category</Label>
+                  <Label className="text-[10px] text-slate-400 uppercase tracking-wider">Satellite Category</Label>
                   <Select value={selectedCategory} onValueChange={handleCategoryChange} disabled={satelliteData.isLoading}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white font-mono text-xs mt-1 h-8">
                       <SelectValue placeholder="Select satellite category" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-slate-800 border-slate-700">
                       {getSatelliteGroupOptions().map((option) => (
                         <SelectItem key={option.value} value={option.value}>
                           <div>
                             <div className="font-medium">{option.label}</div>
-                            <div className="text-sm text-muted-foreground">{option.description}</div>
+                            <div className="text-sm text-slate-400">{option.description}</div>
                           </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                   {satelliteData.isLoading && (
-                    <p className="text-xs text-muted-foreground mt-1">Loading satellites...</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Loading satellites...</p>
                   )}
                   {satelliteData.satellites.size > 0 && !satelliteData.isLoading && (
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-[10px] text-slate-400">
                         Loaded {satelliteData.satellites.size} satellites
                       </p>
                       <div className="flex items-center gap-2">
                         {satelliteData.source === 'LIVE' && (
-                          <Badge variant="secondary" className="text-xs bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+                          <Badge variant="secondary" className="text-[10px] bg-emerald-900 text-emerald-200 border-emerald-700">
                             <Wifi className="w-3 h-3 mr-1" />
                             Live Data
                           </Badge>
                         )}
                         {satelliteData.source === 'ERROR' && (
-                          <Badge variant="destructive" className="text-xs">
+                          <Badge variant="destructive" className="text-[10px]">
                             <WifiOff className="w-3 h-3 mr-1" />
                             Error
                           </Badge>
@@ -381,262 +349,260 @@ export function OrbitRiskPage() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="satellite1" className="text-xs tracking-wider font-semibold text-muted-foreground uppercase">NORAD ID - Satellite 1</Label>
-                  <Input
-                    id="satellite1"
-                    placeholder={`Available: ${getAvailableSatelliteIds()}`}
-                    value={satellite1}
-                    onChange={(e) => handleSatellite1Change(e.target.value)}
-                    disabled={satelliteData.isLoading || satelliteData.satellites.size === 0}
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">Enter NORAD ID or select from available satellites</p>
+                  <Label className="text-[10px] text-slate-400 uppercase tracking-wider">NORAD ID</Label>
+                  <div className="flex gap-2 mt-1">
+                    <Input
+                      value={satellite1}
+                      onChange={(e) => handleSatellite1Change(e.target.value)}
+                      disabled={satelliteData.isLoading}
+                      className="bg-slate-800/50 border-slate-700 text-white font-mono text-xs h-8"
+                      placeholder={satelliteData.satellites.size === 0 ? "Load satellite data first..." : "Enter ID..."}
+                    />
+                    <Button 
+                      size="sm"
+                      disabled={satelliteData.isLoading}
+                      className="btn-glass text-slate-200 px-3 h-8"
+                    >
+                      <Search className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  {satelliteData.satellites.size === 0 && !satelliteData.isLoading && (
+                    <p className="text-[10px] text-yellow-400 mt-1">⚠ Select a satellite category above to load data</p>
+                  )}
                 </div>
-                <div>
-                  <Label htmlFor="satellite2" className="text-xs tracking-wider font-semibold text-muted-foreground uppercase">NORAD ID - Satellite 2</Label>
-                  <Input
-                    id="satellite2"
-                    placeholder={`Available: ${getAvailableSatelliteIds()}`}
-                    value={satellite2}
-                    onChange={(e) => handleSatellite2Change(e.target.value)}
-                    disabled={satelliteData.isLoading || satelliteData.satellites.size === 0}
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">Enter NORAD ID or select from available satellites</p>
-                </div>
-                <div>
-                  <Label htmlFor="timeframe" className="text-xs tracking-wider font-semibold text-muted-foreground uppercase">Timeframe (hours)</Label>
-                  <Input
-                    id="timeframe"
-                    type="number"
-                    value={timeframe}
-                    onChange={(e) => handleTimeframeChange(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">Analysis period: 1-168 hours (1 week max)</p>
-                </div>
-                <Button 
-                  onClick={handleAnalyzeRisk}
-                  disabled={!satellite1 || !satellite2 || isAnalyzing || satelliteData.satellites.size === 0}
-                  className="w-full"
-                >
-                  {isAnalyzing ? 'Analyzing...' : 'Analyze Risk'}
-                </Button>
                 
-                {error && (
-                  <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                    <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+                <div>
+                  <Label className="text-[10px] text-slate-400 uppercase tracking-wider">Secondary Object</Label>
+                  <div className="flex gap-2 mt-1">
+                    <Input
+                      value={satellite2}
+                      onChange={(e) => handleSatellite2Change(e.target.value)}
+                      disabled={satelliteData.isLoading}
+                      className="bg-slate-800/50 border-slate-700 text-white font-mono text-xs h-8"
+                      placeholder={satelliteData.satellites.size === 0 ? "Load satellite data first..." : "Enter ID..."}
+                    />
+                    <Button 
+                      size="sm"
+                      disabled={satelliteData.isLoading}
+                      className="btn-glass text-slate-200 px-3 h-8"
+                    >
+                      <Search className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  {satelliteData.satellites.size === 0 && !satelliteData.isLoading && (
+                    <p className="text-[10px] text-yellow-400 mt-1">⚠ Select a satellite category above to load data</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Target Details */}
+            <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-lg p-3">
+              <h3 className="text-xs font-bold tracking-wider text-cyan-400 uppercase mb-2">Target Details</h3>
+              <div className="space-y-3 text-xs">
+                <div className="pb-2 border-b border-slate-800">
+                  <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Primary</div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Name:</span>
+                      <span className="text-white">{satellite1Details?.name ?? '—'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Altitude:</span>
+                      <span className="text-white">
+                        {typeof satellite1Details?.altitudeKm === 'number' ? `${satellite1Details.altitudeKm.toFixed(0)} km` : '—'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Inclination:</span>
+                      <span className="text-white">
+                        {typeof satellite1Details?.inclinationDeg === 'number' ? `${satellite1Details.inclinationDeg.toFixed(1)}°` : '—'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Category:</span>
+                      <span className="text-white">{satellite1Details?.category ?? '—'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Secondary</div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Name:</span>
+                      <span className="text-white">{satellite2Details?.name ?? '—'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Altitude:</span>
+                      <span className="text-white">
+                        {typeof satellite2Details?.altitudeKm === 'number' ? `${satellite2Details.altitudeKm.toFixed(0)} km` : '—'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Inclination:</span>
+                      <span className="text-white">
+                        {typeof satellite2Details?.inclinationDeg === 'number' ? `${satellite2Details.inclinationDeg.toFixed(1)}°` : '—'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Category:</span>
+                      <span className="text-white">{satellite2Details?.category ?? '—'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Center Panel - 3D Visualization (50% width) */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="col-span-6"
+          >
+            <div className="bg-slate-900/30 backdrop-blur-md border border-slate-800 rounded-lg h-full relative overflow-hidden">
+              {/* 3D Earth Visualization */}
+              <div className="absolute inset-0">
+                <Earth3D 
+                  className="w-full h-full" 
+                  isNightMode={true}
+                  showOrbits={showResults}
+                  position="center"
+                />
+                {/* Distance label overlay */}
+                {analysisResults && (
+                  <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 bg-slate-900/90 backdrop-blur-sm px-4 py-2 rounded-full border border-cyan-500/50 text-cyan-300 font-mono text-sm">
+                    {analysisResults.closestApproachDistance} km
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+              
+              {/* Orbital HUD Overlay */}
+              <OrbitalHUD 
+                satelliteName={satellite1Data?.name || 'ORBITAL_01'} 
+                dataSource={satelliteData.source}
+              />
+            </div>
           </motion.div>
 
-          {/* Visualization Panel */}
+          {/* Right Panel - Mission Planner (25% width) */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="lg:col-span-2"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="col-span-3 space-y-3"
           >
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-primary" />
-                  Orbital Visualization
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="relative h-96 flex items-center justify-center">
-                <div className="relative w-full h-full">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Earth3D 
-                      className="w-full h-full max-w-md max-h-md" 
-                      isNightMode={isNightMode}
-                      showOrbits={true}
-                      position="center"
-                    />
-                    {/* Distance label overlay */}
-                    {analysisResults && (
-                      <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 bg-background/90 backdrop-blur-sm px-3 py-1 rounded-full border border-border text-xs font-medium">
-                        {analysisResults.closestApproachDistance} km
-                      </div>
-                    )}
-                  </div>
-                  {/* Orbital HUD Overlay */}
-                  <OrbitalHUD 
-                    satelliteName={satellite1Data?.name || 'ORBITAL_01'} 
-                    dataSource={satelliteData.source}
-                  />
+            <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-lg p-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg">
+                  <div className={`w-2 h-2 rounded-full ${
+                    analysisResults?.riskLevel === 'HIGH' ? 'bg-red-500 animate-pulse' :
+                    analysisResults?.riskLevel === 'MEDIUM' ? 'bg-yellow-500' :
+                    analysisResults?.riskLevel === 'LOW' ? 'bg-green-500' : 'bg-slate-500'
+                  }`} />
+                  <span className="text-xs uppercase tracking-wider">
+                    {analysisResults?.riskLevel ? `${analysisResults.riskLevel} RISK` : 'NO DATA'}
+                  </span>
                 </div>
-                {/* View toggle button positioned below Earth */}
-                <div className="absolute bottom-0 right-4">
-                  <button
-                    onClick={toggleNightMode}
-                    className="flex items-center gap-2 px-4 py-2 bg-background/80 backdrop-blur-sm rounded-full border border-border shadow-lg hover:bg-accent/30 transition-colors"
-                  >
-                    <span className="text-sm font-medium">View:</span>
-                    <span className="text-sm font-medium">{isNightMode ? 'Day' : 'Night'}</span>
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
 
-          {/* Results Panel */}
-          {showResults && analysisResults && (
-            <motion.div
-              id="analysis-results"
-              variants={resultsContainerVariants}
-              initial="hidden"
-              animate="show"
-              className="lg:col-span-3"
-            >
-              <motion.div variants={resultsItemVariants}>
-                <Card
-                  className={
-                    `overflow-hidden border border-white/10 bg-slate-900/50 backdrop-blur-md ` +
-                    (analysisResults.riskLevel === 'HIGH'
-                      ? 'shadow-[0_0_40px_rgba(239,68,68,0.25)]'
-                      : analysisResults.riskLevel === 'MEDIUM'
-                        ? 'shadow-[0_0_40px_rgba(234,179,8,0.18)]'
-                        : 'shadow-[0_0_40px_rgba(16,185,129,0.18)]')
-                  }
+                <Button 
+                  onClick={handleAnalyzeRisk}
+                  disabled={!satellite1 || !satellite2 || isAnalyzing}
+                  className="btn-glass text-slate-200 font-semibold px-3 py-2 flex items-center gap-2 h-9"
                 >
-                  <CardHeader className="border-b border-white/10 bg-gradient-to-r from-slate-900/60 via-slate-900/30 to-slate-900/60">
-                    <CardTitle className="flex items-center justify-between gap-3">
-                      <span>Analysis Results</span>
-                      <Badge variant="outline" className="border-white/15 bg-white/5 text-xs">
-                        Live
-                      </Badge>
-                    </CardTitle>
-                  </CardHeader>
+                  {isAnalyzing ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                      ANALYZING...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-4 h-4" />
+                      RUN
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
 
-                  <CardContent className="pt-6">
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                        <div className="text-left">
-                          <div className="text-sm font-semibold text-white/90 truncate">{analysisResults.satellite1Name}</div>
-                          <div className="mt-2">
-                            <Badge variant="secondary" className="bg-white/5 text-white/70 border border-white/10 text-xs">
-                              {analysisResults.satellite1Category}
-                            </Badge>
-                          </div>
+            <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-lg p-3">
+              <h3 className="text-xs font-bold tracking-wider text-cyan-400 uppercase mb-2">Results</h3>
+              {analysisResults ? (
+                <div className="space-y-2 text-xs font-mono">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Risk:</span>
+                    <span className={`font-bold ${
+                      analysisResults.riskLevel === 'HIGH' ? 'text-red-400' :
+                      analysisResults.riskLevel === 'MEDIUM' ? 'text-yellow-400' :
+                      'text-emerald-400'
+                    }`}>
+                      {analysisResults.riskLevel}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Closest approach:</span>
+                    <span className="text-white">{analysisResults.closestApproachDistance} km</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">TCA (UTC):</span>
+                    <span className="text-white">
+                      {analysisResults.timeOfClosestApproach}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Timeframe:</span>
+                    <span className="text-white">{analysisResults.timeframeHours}h</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Runtime:</span>
+                    <span className="text-white">
+                      {typeof analysisResults.calculationDurationMs === 'number'
+                        ? `${analysisResults.calculationDurationMs.toFixed(0)}ms`
+                        : '—'}
+                    </span>
+                  </div>
+                  <div className="pt-2 border-t border-slate-800">
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Conjunction Pair</div>
+                    <div className="text-[10px] text-white">{analysisResults.satellite1Name}</div>
+                    <div className="text-[10px] text-slate-400">{analysisResults.satellite1Category}</div>
+                    <div className="my-1 text-[10px] text-slate-500">↔</div>
+                    <div className="text-[10px] text-white">{analysisResults.satellite2Name}</div>
+                    <div className="text-[10px] text-slate-400">{analysisResults.satellite2Category}</div>
+                  </div>
+                  <div className="pt-2 border-t border-slate-800">
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Reasons</div>
+                    <div className="space-y-1">
+                      {(analysisResults.riskReasons ?? []).slice(0, 3).map((reason: string, idx: number) => (
+                        <div key={idx} className="text-xs text-slate-300">
+                          - {reason}
                         </div>
-                        <div className="text-center">
-                          <div className="text-xs tracking-[0.35em] text-white/50">VS</div>
+                      ))}
+                      {(analysisResults.riskReasons ?? []).length > 3 && (
+                        <div className="text-xs text-slate-500">
+                          +{(analysisResults.riskReasons ?? []).length - 3} more
                         </div>
-                        <div className="text-right">
-                          <div className="text-sm font-semibold text-white/90 truncate">{analysisResults.satellite2Name}</div>
-                          <div className="mt-2 flex justify-end">
-                            <Badge variant="secondary" className="bg-white/5 text-white/70 border border-white/10 text-xs">
-                              {analysisResults.satellite2Category}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
+                      )}
                     </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-xs text-slate-400 font-mono">
+                  Run simulation to generate results.
+                </div>
+              )}
+            </div>
 
-                    <div className="mt-6 grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-4">
-                      <div
-                        className={
-                          `rounded-2xl border border-white/10 bg-white/5 p-6 ` +
-                          (analysisResults.riskLevel === 'HIGH'
-                            ? 'shadow-[0_0_32px_rgba(239,68,68,0.22)]'
-                            : analysisResults.riskLevel === 'MEDIUM'
-                              ? 'shadow-[0_0_32px_rgba(234,179,8,0.16)]'
-                              : 'shadow-[0_0_32px_rgba(16,185,129,0.14)]')
-                        }
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="text-xs tracking-wider font-semibold text-white/60 uppercase">Risk Level</div>
-                          <Activity className="h-4 w-4 text-white/50" />
-                        </div>
-                        <div
-                          className={
-                            `mt-4 text-5xl font-extrabold leading-none ` +
-                            (analysisResults.riskLevel === 'HIGH'
-                              ? 'text-red-500 animate-pulse'
-                              : analysisResults.riskLevel === 'MEDIUM'
-                                ? 'text-yellow-400'
-                                : 'text-emerald-400')
-                          }
-                        >
-                          {analysisResults.riskLevel}
-                        </div>
-                        <div className="mt-3 text-sm text-white/55">
-                          Confidence signals: {analysisResults.riskReasons.length}
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="text-xs tracking-wider font-semibold text-white/60 uppercase">Closest Approach</div>
-                            <Ruler className="h-4 w-4 text-white/50" />
-                          </div>
-                          <div className="mt-4 text-4xl font-bold text-cyan-300">
-                            {analysisResults.closestApproachDistance}
-                            <span className="ml-2 text-sm font-semibold text-white/50">km</span>
-                          </div>
-                          <div className="mt-2 text-xs text-white/45">Minimum separation within the selected window</div>
-                        </div>
-
-                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="text-xs tracking-wider font-semibold text-white/60 uppercase">Time of Closest (UTC)</div>
-                            <Clock className="h-4 w-4 text-white/50" />
-                          </div>
-                          <div className="mt-4 text-3xl font-bold text-white/90">
-                            {new Date(analysisResults.timeOfClosestApproach).toLocaleTimeString('en-US', {
-                              timeZone: 'UTC',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                            <span className="ml-2 text-sm font-semibold text-white/50">UTC</span>
-                          </div>
-                          <div className="mt-2 text-xs text-white/45">
-                            {new Date(analysisResults.timeOfClosestApproach).toLocaleDateString('en-US', {
-                              timeZone: 'UTC',
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric'
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="text-sm font-semibold text-white/90 uppercase tracking-wider">Risk Analysis Factors</div>
-                        <Badge variant="secondary" className="bg-white/5 text-white/70 border border-white/10 text-xs">
-                          {analysisResults.riskReasons.length}
-                        </Badge>
-                      </div>
-                      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {analysisResults.riskReasons.map((reason: string, index: number) => {
-                          const isNegative = /high|danger|collision|impact|close|warning|critical|risk/i.test(reason);
-                          return (
-                            <div
-                              key={index}
-                              className="flex items-start gap-3 rounded-xl border border-white/10 bg-slate-950/30 px-4 py-3"
-                            >
-                              {isNegative ? (
-                                <AlertTriangle className="h-5 w-5 text-yellow-400 mt-0.5" />
-                              ) : (
-                                <CheckCircle2 className="h-5 w-5 text-emerald-400 mt-0.5" />
-                              )}
-                              <div className="text-sm text-white/70 leading-snug">{reason}</div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </motion.div>
-          )}
+            {/* Error Display */}
+            {error && (
+              <div className="bg-red-900/20 border border-red-800 rounded-lg p-3">
+                <p className="text-sm text-red-400 font-mono">{error}</p>
+              </div>
+            )}
+          </motion.div>
         </div>
       </div>
-      </main>
     </div>
   );
 }

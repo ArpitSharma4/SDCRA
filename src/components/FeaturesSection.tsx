@@ -120,7 +120,7 @@ export function FeaturesSection() {
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    className="group/btn hover:bg-primary/10 hover:text-primary p-0 h-auto font-medium"
+                    className="group/btn hover:bg-slate-200/10 hover:text-white p-0 h-auto font-medium"
                   >
                     {feature.action}
                     <ArrowUpRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
