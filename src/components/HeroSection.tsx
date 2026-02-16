@@ -31,10 +31,9 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: Github, href: '#', label: 'GitHub' },
-  { icon: Twitter, href: '#', label: 'Twitter' },
-  { icon: Linkedin, href: '#', label: 'LinkedIn' },
-  { icon: Mail, href: '#', label: 'Email' },
+  { icon: Github, href: 'https://github.com/ArpitSharma4', label: 'GitHub' },
+  { icon: Twitter, href: 'https://x.com/sharmaarpit05?s=11', label: 'Twitter' },
+  { icon: Linkedin, href: 'https://www.linkedin.com/in/arpit-sharma-76b2b2238/', label: 'LinkedIn' },
 ];
 
 export function HeroSection({ onNavigate }: HeroSectionProps) {
@@ -196,21 +195,23 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
 
           {/* Bottom Bar */}
           <div className="border-t border-border/50 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} SDCRA. All rights reserved.
-            </p>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 order-2 md:order-1">
               {socialLinks.map(({ icon: Icon, href, label }) => (
                 <a
                   key={label}
                   href={href}
                   aria-label={label}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Icon className="h-5 w-5" />
                 </a>
               ))}
             </div>
+            <p className="text-sm text-muted-foreground order-1 md:order-2 text-center md:text-right">
+              © {new Date().getFullYear()} SDCRA. All rights reserved.
+            </p>
           </div>
         </div>
       </div>
