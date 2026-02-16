@@ -96,7 +96,7 @@ const SatcatPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-emerald-500/95 font-mono pt-20 md:pt-28">
+    <div className="min-h-screen bg-slate-950 text-emerald-500/95 font-mono">
       {/* Header */}
       <div className="sticky top-0 z-10 border-b border-emerald-500/20">
         <div className="container mx-auto px-4 py-4">

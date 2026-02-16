@@ -126,25 +126,9 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-emerald-500/95 font-mono pt-20 md:pt-28">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <Shield className="w-8 h-8 text-emerald-400" />
-            <h1 className="text-3xl font-bold text-emerald-400">
-              ENCRYPTED TRANSMISSION // CONTACT
-            </h1>
-            <Lock className="w-8 h-8 text-emerald-400" />
-          </div>
-          <p className="text-emerald-500/60">
-            Secure communication channel for SDCRA operations
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-slate-950 text-emerald-500/95 font-mono pt-20">
+      <div className="container mx-auto px-4 py-4">
+        {/* Header - Removed for cleaner layout */}
 
         {/* Contact Form */}
         <motion.div
@@ -162,7 +146,7 @@ export default function Contact() {
             </CardHeader>
             
             <CardContent className="pt-6">
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Name Field */}
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-emerald-400 text-sm font-medium">
@@ -208,7 +192,7 @@ export default function Contact() {
                     value={formData.message}
                     onChange={handleInputChange}
                     placeholder="Enter your encrypted message..."
-                    rows={6}
+                    rows={3}
                     className="bg-slate-800/50 border-emerald-500/30 text-emerald-400 placeholder-emerald-500/40 focus:border-emerald-500/60 focus:bg-slate-800/70 resize-none"
                     disabled={formStatus.type === 'sending'}
                   />
@@ -245,7 +229,7 @@ export default function Contact() {
               </form>
 
               {/* Security Notice */}
-              <div className="mt-8 p-4 bg-slate-800/30 border border-emerald-500/20 rounded-lg">
+              <div className="mt-4 p-3 bg-slate-800/30 border border-emerald-500/20 rounded-lg">
                 <div className="flex items-start gap-3">
                   <Lock className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
                   <div className="text-xs text-emerald-500/60">
@@ -259,8 +243,8 @@ export default function Contact() {
           </Card>
         </motion.div>
 
-        {/* Additional Info */}
-        <motion.div
+        {/* Additional Info - Hidden for compact view */}
+        {/* <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -280,7 +264,7 @@ export default function Contact() {
               <p className="text-xs text-emerald-500/60">Delivery Confirmation</p>
             </div>
           </div>
-        </motion.div>
+        </motion.div> */}
       </div>
     </div>
   );

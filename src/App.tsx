@@ -52,6 +52,11 @@ const AppWithNavigation = () => {
     return (location.hash.replace('#', '') || 'home') as any;
   }, [location.pathname, location.hash]);
 
+  // Determine if navigation should be hidden on current page
+  const hideNavigation = useMemo(() => {
+    return location.pathname === '/satcat' || location.pathname === '/documentation';
+  }, [location.pathname]);
+
   // Send a pageview beacon on route changes (owner analytics only).
   useEffect(() => {
     const path = location.pathname + location.search + location.hash;
@@ -60,7 +65,7 @@ const AppWithNavigation = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden flex flex-col">
-      <Navigation onNavigate={handleNavigation} activeSection={activeSection} />
+      {!hideNavigation && <Navigation onNavigate={handleNavigation} activeSection={activeSection} />}
       <main className="flex-grow flex flex-col" style={{ minHeight: 0 }}>
         <Suspense fallback={
           <div className="flex items-center justify-center h-64">

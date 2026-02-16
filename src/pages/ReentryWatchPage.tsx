@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
-import { AlertTriangle, Flame, Radar, Satellite as SatelliteIcon, Zap } from "lucide-react";
+import { AlertTriangle, Flame, Radar, Satellite as SatelliteIcon } from "lucide-react";
 import { ReentryMap } from "@/components/ReentryMap";
 
 type DecayStatus = "CRITICAL" | "WARNING" | "STABLE";
@@ -72,6 +72,7 @@ export const ReentryWatchPage: React.FC = () => {
 
   const [decayers, setDecayers] = useState<DecayingSatellite[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [topListCount, setTopListCount] = useState<10 | 20 | 50>(20);
 
   const allSourcesLoading =
     activeData.isLoading &&
@@ -252,15 +253,11 @@ export const ReentryWatchPage: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header / Hero framing */}
         <motion.div
-          initial={{ opacity: 0, y: -12 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="flex flex-col gap-3"
         >
-          <div className="inline-flex items-center gap-2 text-[10px] sm:text-xs uppercase tracking-[0.3em] text-red-400/80">
-            <Zap className="w-3 h-3" />
-            <span>Reentry Watch // VLEO Decay Monitor</span>
-          </div>
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-slate-100">
               ORBITAL DECAY MONITOR
@@ -439,19 +436,30 @@ export const ReentryWatchPage: React.FC = () => {
                     <Flame className="w-4 h-4 text-red-400" />
                     Top Decaying Objects
                   </CardTitle>
-                  <p className="text-[11px] text-slate-400 mt-1">
-                    Sorted by altitude ascending. The object closest to 0 km is the critical threat.
-                  </p>
-                </div>
-                <div className="text-right text-[11px] text-slate-400">
-                  <p className="uppercase tracking-[0.25em] text-slate-500">Tracking</p>
-                  <p>
-                    {decayers.length > 0 ? `Top ${Math.min(decayers.length, 20)} of ${decayers.length}` : "—"}
-                  </p>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="pt-3">
+              <div className="mb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <p className="text-[11px] text-slate-500">
+                  Sorted by altitude ascending. Closest to 0 km is the critical threat.
+                </p>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] uppercase tracking-[0.25em] text-slate-500">Show</span>
+                  <select
+                    value={topListCount}
+                    onChange={(e) => setTopListCount(Number(e.target.value) as 10 | 20 | 50)}
+                    className="h-8 rounded-md bg-slate-900/70 border border-slate-700 text-slate-200 text-[11px] px-2 focus:outline-none focus:border-slate-500"
+                  >
+                    <option value={10}>Top 10</option>
+                    <option value={20}>Top 20</option>
+                    <option value={50}>Top 50</option>
+                  </select>
+                  <span className="text-[11px] text-slate-500">
+                    {decayers.length > 0 ? `of ${decayers.length}` : ""}
+                  </span>
+                </div>
+              </div>
               <div className="rounded border border-slate-800/80 bg-slate-950/80 overflow-hidden">
                 <Table className="text-xs sm:text-sm">
                   <TableHeader>
@@ -464,7 +472,7 @@ export const ReentryWatchPage: React.FC = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {decayers.slice(0, 20).map((sat) => (
+                    {decayers.slice(0, topListCount).map((sat) => (
                       <TableRow
                         key={sat.id}
                         className={`cursor-pointer transition-colors ${
