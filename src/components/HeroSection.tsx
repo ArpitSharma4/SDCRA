@@ -21,7 +21,7 @@ const footerLinks = {
   Resources: [
     { label: 'Documentation', href: '/documentation' },
     { label: 'TLE Database', href: '/satcat' },
-    { label: 'Research Papers', href: '#' },
+    { label: 'Research Papers', href: '/docs/KESSLER_RESEARCH_PAPER.pdf', target: '_blank', rel: 'noopener noreferrer' },
     { label: 'FAQ', href: '/faq' },
   ],
   Company: [
@@ -66,7 +66,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           {/* Status Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+                       animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/50 backdrop-blur-sm border border-border/50 mb-8"
           >
@@ -180,12 +180,23 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
                 <ul className="space-y-2">
                   {links.map((link) => (
                     <li key={link.label}>
-                      <Link 
-                        to={link.href}
-                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        {link.label}
-                      </Link>
+                      {link.href.includes('.pdf') ? (
+                        <a
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {link.label}
+                        </a>
+                      ) : (
+                        <Link 
+                          to={link.href}
+                          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {link.label}
+                        </Link>
+                      )}
                     </li>
                   ))}
                 </ul>
