@@ -10,12 +10,7 @@ Expanded the Space Debris Collision Risk Analyser to support all major satellite
   - 🛰️ **Space Stations** - ISS, Tiangong, and other space stations
   - 📡 **Starlink** - SpaceX Starlink satellite constellation
   - 🗺️ **GPS / GNSS** - GPS, GLONASS, Galileo, and other navigation satellites
-  - 🛰️ **Active Satellites** - All currently operational satellites (thousands)
-  - 💥 **1999-025 Debris** - Fengyun 1C anti-satellite test debris
-  - ☄️ **Iridium 33 Debris** - Iridium 33 collision debris cloud
-  - 🌤️ **Weather Satellites** - Meteorological and weather monitoring satellites
-  - 📻 **Communications** - Communications and broadcasting satellites
-
+  
 ### 2. Enhanced Data Service (`src/utils/satelliteUtils.ts`)
 - **`fetchTLEGroup(groupKey)`** - Fetch TLE data for specific satellite groups
 - **`getRandomSatellitesFromGroup()`** - Get random satellites for testing

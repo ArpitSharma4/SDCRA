@@ -45,8 +45,8 @@ server: {
 - And more...
 
 ## Benefits
-✅ Live TLE data restored
-✅ CORS issues resolved
-✅ Better error handling
-✅ Detailed logging
-✅ Fallback data still available
+ Live TLE data restored
+ CORS issues resolved
+ Better error handling
+ Detailed logging
+ Fallback data still available
