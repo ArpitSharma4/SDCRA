@@ -24,7 +24,7 @@ const SatcatPage = () => {
       try {
         setLoading(true);
         console.log('Fetching satellite data...');
-        const response = await fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=json');
+        const response = await fetch(`https://corsproxy.io/?${encodeURIComponent('https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=json')}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

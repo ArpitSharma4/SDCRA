@@ -77,6 +77,70 @@ app.post('/api/ai/command', async (req, res) => {
   }
 });
 
+// Celestrak proxy endpoints to solve CORS/HTTPS issues
+app.get('/api/celestrak/*', async (req, res) => {
+  try {
+    const celestrakUrl = `https://celestrak.org${req.path.replace('/api/celestrak', '')}`;
+    console.log(`🛰️ Proxying request to: ${celestrakUrl}`);
+    
+    const response = await fetch(celestrakUrl);
+    
+    if (!response.ok) {
+      throw new Error(`Celestrak API error: ${response.status} ${response.statusText}`);
+    }
+    
+    // Set appropriate headers
+    res.set({
+      'Content-Type': response.headers.get('Content-Type') || 'text/plain',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    });
+    
+    const data = await response.text();
+    res.send(data);
+    
+  } catch (error) {
+    console.error('Celestrak proxy error:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch satellite data',
+      message: error.message 
+    });
+  }
+});
+
+// Alternative Celestrak proxy (for celestrak.com)
+app.get('/api/celestrak-com/*', async (req, res) => {
+  try {
+    const celestrakUrl = `https://celestrak.com${req.path.replace('/api/celestrak-com', '')}`;
+    console.log(`🛰️ Proxying request to: ${celestrakUrl}`);
+    
+    const response = await fetch(celestrakUrl);
+    
+    if (!response.ok) {
+      throw new Error(`Celestrak API error: ${response.status} ${response.statusText}`);
+    }
+    
+    // Set appropriate headers
+    res.set({
+      'Content-Type': response.headers.get('Content-Type') || 'text/plain',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    });
+    
+    const data = await response.text();
+    res.send(data);
+    
+  } catch (error) {
+    console.error('Celestrak proxy error:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch satellite data',
+      message: error.message 
+    });
+  }
+});
+
 // Send email endpoint
 app.post('/api/send-email', async (req, res) => {
   const { name, email, message } = req.body;

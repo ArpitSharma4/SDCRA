@@ -5,7 +5,7 @@ export async function debugTestStarlink() {
   try {
     // Test direct URL fetch
     console.log('📡 Fetching Starlink TLE data directly...');
-    const response = await fetch('https://celestrak.org/NORAD/elements/starlink.txt');
+    const response = await fetch('/api/celestrak/NORAD/elements/starlink.txt');
     
     if (!response.ok) {
       console.error(' Failed to fetch Starlink data:', response.status, response.statusText);
@@ -61,7 +61,7 @@ export async function debugTestParsing() {
     // Import the parse function (we'll need to make it exportable)
     const { parseTLEData } = await import('./satelliteUtils');
     
-    const response = await fetch('https://celestrak.org/NORAD/elements/starlink.txt');
+    const response = await fetch('/api/celestrak/NORAD/elements/starlink.txt');
     const text = await response.text();
     
     console.log('Parsing Starlink data...');

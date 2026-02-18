@@ -43,9 +43,10 @@ export function useSatelliteData(categoryId: string | null): SatelliteData {
     try {
       console.log(`🔄 Fetching satellite data for category: ${id}`);
       console.log(`🔗 Using proxy URL: ${group.proxyUrl}`);
+      console.log(`🔗 CORS Proxy URL: ${group.corsProxyUrl}`);
       console.log(`🔗 Original URL: ${group.url}`);
       
-      // Strategy 1: Try to fetch from our Vite proxy
+      // Strategy 1: Try to fetch from our Vite proxy (for development)
       let response = await fetch(group.proxyUrl, {
         method: 'GET',
         headers: {
@@ -88,9 +89,48 @@ export function useSatelliteData(categoryId: string | null): SatelliteData {
       throw new Error(`Proxy returned status ${response.status}`);
 
     } catch (proxyError) {
-      console.warn(`⚠️ Proxy failed for ${id}, trying fallback:`, proxyError);
+      console.warn(`⚠️ Local proxy failed for ${id}, trying CORS proxy:`, proxyError);
       
-      // Strategy 2: Fallback to local static file
+      // Strategy 1.5: Try CORS proxy for production
+      try {
+        console.log(`🔄 Trying CORS proxy: ${group.corsProxyUrl}`);
+        
+        let corsResponse = await fetch(group.corsProxyUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'text/plain, application/json',
+            'Cache-Control': 'no-cache'
+          },
+          signal: AbortSignal.timeout(15000) // 15 second timeout for CORS proxy
+        });
+
+        console.log(`📊 CORS Proxy Response status: ${corsResponse.status}`);
+
+        if (corsResponse.ok) {
+          const text = await corsResponse.text();
+          
+          console.log(`✅ CORS Proxy data fetched: ${text.length} chars`);
+          console.log(`📝 First 100 chars: ${text.substring(0, 100)}`);
+          
+          const satellites = parseTLEData(text, 'cors-proxy-live');
+          
+          setData({
+            satellites,
+            source: 'LIVE',
+            isLoading: false,
+            error: null,
+            satelliteCount: satellites.size,
+            group
+          });
+          return;
+        }
+
+        throw new Error(`CORS Proxy returned status ${corsResponse.status}`);
+
+      } catch (corsError) {
+        console.warn(`⚠️ CORS proxy failed for ${id}, trying fallback:`, corsError);
+      
+        // Strategy 2: Fallback to local static file
       try {
         const fallbackUrl = `/${id}.txt`;
         console.log(`🔄 Trying fallback file: ${fallbackUrl}`);
@@ -120,7 +160,7 @@ export function useSatelliteData(categoryId: string | null): SatelliteData {
         });
 
       } catch (fallbackError) {
-        console.error(`❌ Both proxy and fallback failed for ${id}:`, fallbackError);
+        console.error(` Both proxy and fallback failed for ${id}:`, fallbackError);
         
         // Strategy 3: Use hardcoded fallback data
         const hardcodedFallbacks = getHardcodedFallbacks(id);
@@ -135,7 +175,9 @@ export function useSatelliteData(categoryId: string | null): SatelliteData {
         });
       }
     }
-  }, []);
+  };
+
+  }, [getSatelliteGroup, parseTLEData]);
 
   // Helper function to get hardcoded fallback data
   const getHardcodedFallbacks = (id: string): Map<string, any> => {
@@ -169,15 +211,15 @@ export function useSatelliteData(categoryId: string | null): SatelliteData {
         {
           name: 'GPS BIIR-5 (PRN 15)',
           tle1: '1 26360U 00025A   25030.12345678  .00000000  00000+0  00000+0 0  9997',
-          tle2: '2 26360  55.0000 000.0000 0000000  00.0000 000.0000  2.00561234567890',
+          tle2: '2 26360  55.0000 000.0000 0000000  00.0000 000.0000 2.00561234567890',
           source: 'hardcoded-fallback'
         }
       ],
-      'weather': [
+      'iridium-33-debris': [
         {
-          name: 'HUBBLE SPACE TELESCOPE',
-          tle1: '1 20580U 90037B   25030.12345678  .00000000  00000+0  00000+0 0  9997',
-          tle2: '2 20580  28.4700 000.0000 0000000  00.0000 000.0000 14.12345678901234',
+          name: 'IRIDIUM 33 DEBRIS',
+          tle1: '1 35939U 99049C   25030.12345678  .00000000  00000+0  00000+0 0  9997',
+          tle2: '2 35939  86.4000 000.0000 0000000  00.0000 000.0000 14.34261234567890',
           source: 'hardcoded-fallback'
         }
       ]

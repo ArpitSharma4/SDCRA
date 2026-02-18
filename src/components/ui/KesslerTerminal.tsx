@@ -170,7 +170,7 @@ export const KesslerTerminal: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-96 bg-slate-950 border border-cyan-500/30 backdrop-blur-md shadow-2xl shadow-cyan-500/10">
+    <div className="fixed bottom-6 right-24 z-50 w-96 bg-slate-950 border border-cyan-500/30 backdrop-blur-md shadow-2xl shadow-cyan-500/10">
       {/* Header */}
       <div className={`p-3 border-b flex items-center justify-between ${
         mode === 'CLOUD' 
