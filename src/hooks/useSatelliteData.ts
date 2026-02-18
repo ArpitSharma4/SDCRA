@@ -43,43 +43,41 @@ export function useSatelliteData(categoryId: string | null): SatelliteData {
     try {
       console.log(`🔄 Fetching satellite data for category: ${id}`);
       console.log(`🔗 Using proxy URL: ${group.proxyUrl}`);
-      console.log(`🔗 CORS Proxy URL: ${group.corsProxyUrl}`);
+      console.log(`🔗 Vercel API URL: ${group.corsProxyUrl}`);
       console.log(`🔗 Original URL: ${group.url}`);
       
       // Check if we're in production (no local server available)
       const isProduction = !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1');
       
       if (isProduction) {
-        console.log('🌐 Production mode detected - using CORS proxy');
-        // Strategy 1: Try CORS proxy directly for production
+        console.log('🌐 Production mode detected - using Vercel serverless function');
+        // Strategy 1: Try our Vercel serverless function
         try {
-          console.log(`🔄 Trying CORS proxy: ${group.corsProxyUrl}`);
+          console.log(`🔄 Trying Vercel API: ${group.corsProxyUrl}`);
           
-          let corsResponse = await fetch(group.corsProxyUrl, {
+          let vercelResponse = await fetch(group.corsProxyUrl, {
             method: 'GET',
             headers: {
-              'Accept': 'text/plain, application/json',
-              'Cache-Control': 'no-cache',
-              'User-Agent': 'Mozilla/5.0 (compatible; SDCRA/1.0)'
+              'Accept': 'text/plain',
+              'Cache-Control': 'no-cache'
             },
-            signal: AbortSignal.timeout(20000) // Increased timeout to 20 seconds
+            signal: AbortSignal.timeout(15000) // 15 second timeout
           });
 
-          console.log(`📊 CORS Proxy Response status: ${corsResponse.status}`);
-          console.log(`📊 CORS Proxy Response headers:`, Object.fromEntries(corsResponse.headers.entries()));
+          console.log(`📊 Vercel API Response status: ${vercelResponse.status}`);
 
-          if (corsResponse.ok) {
-            const text = await corsResponse.text();
+          if (vercelResponse.ok) {
+            const text = await vercelResponse.text();
             
-            console.log(`✅ CORS Proxy data fetched: ${text.length} chars`);
+            console.log(`✅ Vercel API data fetched: ${text.length} chars`);
             console.log(`📝 First 100 chars: ${text.substring(0, 100)}`);
             
             // Check if we got actual TLE data or an error page
-            if (text.includes('Access Denied') || text.includes('403 Forbidden') || text.includes('<!DOCTYPE html>')) {
-              throw new Error('CORS proxy returned access denied or HTML error page');
+            if (text.includes('error') || text.includes('Access Denied') || text.includes('<!DOCTYPE html>')) {
+              throw new Error('Vercel API returned error or HTML page');
             }
             
-            const satellites = parseTLEData(text, 'cors-proxy-live');
+            const satellites = parseTLEData(text, 'vercel-api-live');
             
             setData({
               satellites,
@@ -92,61 +90,15 @@ export function useSatelliteData(categoryId: string | null): SatelliteData {
             return;
           }
 
-          throw new Error(`CORS Proxy returned status ${corsResponse.status}`);
+          throw new Error(`Vercel API returned status ${vercelResponse.status}`);
 
-        } catch (corsError) {
-          console.warn(`⚠️ CORS proxy failed for ${id}, trying backup CORS proxy:`, corsError);
-          console.warn(`⚠️ CORS proxy error details:`, {
-            message: corsError.message,
-            name: corsError.name,
-            stack: corsError.stack
+        } catch (vercelError) {
+          console.warn(`⚠️ Vercel API failed for ${id}, trying fallback:`, vercelError);
+          console.warn(`⚠️ Vercel API error details:`, {
+            message: vercelError.message,
+            name: vercelError.name,
+            stack: vercelError.stack
           });
-          
-          // Try backup CORS proxy
-          try {
-            console.log(`🔄 Trying backup CORS proxy: ${group.corsProxyUrl2}`);
-            
-            let corsResponse2 = await fetch(group.corsProxyUrl2, {
-              method: 'GET',
-              headers: {
-                'Accept': 'text/plain, application/json',
-                'Cache-Control': 'no-cache',
-                'User-Agent': 'Mozilla/5.0 (compatible; SDCRA/1.0)'
-              },
-              signal: AbortSignal.timeout(20000) // 20 second timeout
-            });
-
-            console.log(`📊 Backup CORS Proxy Response status: ${corsResponse2.status}`);
-
-            if (corsResponse2.ok) {
-              const text = await corsResponse2.text();
-              
-              console.log(`✅ Backup CORS Proxy data fetched: ${text.length} chars`);
-              console.log(`📝 First 100 chars: ${text.substring(0, 100)}`);
-              
-              // Check if we got actual TLE data or an error page
-              if (text.includes('Access Denied') || text.includes('403 Forbidden') || text.includes('<!DOCTYPE html>')) {
-                throw new Error('Backup CORS proxy returned access denied or HTML error page');
-              }
-              
-              const satellites = parseTLEData(text, 'backup-cors-proxy-live');
-              
-              setData({
-                satellites,
-                source: 'LIVE',
-                isLoading: false,
-                error: null,
-                satelliteCount: satellites.size,
-                group
-              });
-              return;
-            }
-
-            throw new Error(`Backup CORS Proxy returned status ${corsResponse2.status}`);
-
-          } catch (corsError2) {
-            console.warn(`⚠️ Backup CORS proxy also failed for ${id}, trying fallback:`, corsError2);
-          }
         }
       } else {
         console.log('🏠 Development mode detected - using local proxy');

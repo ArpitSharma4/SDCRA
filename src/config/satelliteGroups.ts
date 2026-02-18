@@ -19,8 +19,8 @@ export const satelliteGroups: SatelliteGroup[] = [
     description: '',
     url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=stations&FORMAT=tle',
     proxyUrl: '/api/celestrak/NORAD/elements/gp.php?GROUP=stations&FORMAT=tle',
-    corsProxyUrl: `https://corsproxy.io/?${encodeURIComponent('https://celestrak.org/NORAD/elements/gp.php?GROUP=stations&FORMAT=tle')}`,
-    corsProxyUrl2: `https://api.allorigins.win/raw?url=${encodeURIComponent('https://celestrak.org/NORAD/elements/gp.php?GROUP=stations&FORMAT=tle')}`,
+    corsProxyUrl: '/api/tle?GROUP=stations&FORMAT=tle',
+    corsProxyUrl2: '/api/tle?GROUP=stations&FORMAT=tle',
     fallbackFile: '/stations.txt',
     color: '#FF6B6B',
     icon: 'Satellite'
@@ -31,8 +31,8 @@ export const satelliteGroups: SatelliteGroup[] = [
     description: '',
     url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle',
     proxyUrl: '/api/celestrak/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle',
-    corsProxyUrl: `https://corsproxy.io/?${encodeURIComponent('https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle')}`,
-    corsProxyUrl2: `https://api.allorigins.win/raw?url=${encodeURIComponent('https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle')}`,
+    corsProxyUrl: '/api/tle?GROUP=starlink&FORMAT=tle',
+    corsProxyUrl2: '/api/tle?GROUP=starlink&FORMAT=tle',
     fallbackFile: '/starlink.txt',
     color: '#00D4FF',
     icon: 'Satellite'
@@ -43,8 +43,8 @@ export const satelliteGroups: SatelliteGroup[] = [
     description: '',
     url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=gnss&FORMAT=tle',
     proxyUrl: '/api/celestrak/NORAD/elements/gp.php?GROUP=gnss&FORMAT=tle',
-    corsProxyUrl: `https://corsproxy.io/?${encodeURIComponent('https://celestrak.org/NORAD/elements/gp.php?GROUP=gnss&FORMAT=tle')}`,
-    corsProxyUrl2: `https://api.allorigins.win/raw?url=${encodeURIComponent('https://celestrak.org/NORAD/elements/gp.php?GROUP=gnss&FORMAT=tle')}`,
+    corsProxyUrl: '/api/tle?GROUP=gnss&FORMAT=tle',
+    corsProxyUrl2: '/api/tle?GROUP=gnss&FORMAT=tle',
     fallbackFile: '/gnss.txt',
     color: '#4ECDC4',
     icon: 'MapPin'
@@ -55,8 +55,8 @@ export const satelliteGroups: SatelliteGroup[] = [
     description: '',
     url: 'https://celestrak.org/NORAD/elements/gp.php?GROUP=iridium-33-debris&FORMAT=tle',
     proxyUrl: '/api/celestrak/NORAD/elements/gp.php?GROUP=iridium-33-debris&FORMAT=tle',
-    corsProxyUrl: `https://corsproxy.io/?${encodeURIComponent('https://celestrak.org/NORAD/elements/gp.php?GROUP=iridium-33-debris&FORMAT=tle')}`,
-    corsProxyUrl2: `https://api.allorigins.win/raw?url=${encodeURIComponent('https://celestrak.org/NORAD/elements/gp.php?GROUP=iridium-33-debris&FORMAT=tle')}`,
+    corsProxyUrl: '/api/tle?GROUP=iridium-33-debris&FORMAT=tle',
+    corsProxyUrl2: '/api/tle?GROUP=iridium-33-debris&FORMAT=tle',
     fallbackFile: '/iridium-33-debris.txt',
     color: '#FF69B4',
     icon: 'Zap'
