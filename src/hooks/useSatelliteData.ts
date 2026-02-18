@@ -46,89 +46,94 @@ export function useSatelliteData(categoryId: string | null): SatelliteData {
       console.log(`🔗 CORS Proxy URL: ${group.corsProxyUrl}`);
       console.log(`🔗 Original URL: ${group.url}`);
       
-      // Strategy 1: Try to fetch from our Vite proxy (for development)
-      let response = await fetch(group.proxyUrl, {
-        method: 'GET',
-        headers: {
-          'Accept': 'text/plain, application/json',
-          'Cache-Control': 'no-cache'
-        },
-        signal: AbortSignal.timeout(10000) // 10 second timeout
-      });
-
-      console.log(`📊 Response status: ${response.status} for ${group.proxyUrl}`);
-
-      if (response.ok) {
-        const contentType = response.headers.get('content-type');
-        
-        if (contentType?.includes('application/json')) {
-          // Proxy returned an error JSON
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Proxy error');
-        } else {
-          // Proxy returned TLE data successfully
-          const text = await response.text();
-          
-          console.log(`✅ Live data fetched: ${text.length} chars`);
-          console.log(`📝 First 100 chars: ${text.substring(0, 100)}`);
-          
-          const satellites = parseTLEData(text, 'proxy-live');
-          
-          setData({
-            satellites,
-            source: 'LIVE',
-            isLoading: false,
-            error: null,
-            satelliteCount: satellites.size,
-            group
-          });
-          return;
-        }
-      }
-
-      throw new Error(`Proxy returned status ${response.status}`);
-
-    } catch (proxyError) {
-      console.warn(`⚠️ Local proxy failed for ${id}, trying CORS proxy:`, proxyError);
+      // Check if we're in production (no local server available)
+      const isProduction = !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1');
       
-      // Strategy 1.5: Try CORS proxy for production
-      try {
-        console.log(`🔄 Trying CORS proxy: ${group.corsProxyUrl}`);
-        
-        let corsResponse = await fetch(group.corsProxyUrl, {
+      if (isProduction) {
+        console.log('🌐 Production mode detected - using CORS proxy');
+        // Strategy 1: Try CORS proxy directly for production
+        try {
+          console.log(`🔄 Trying CORS proxy: ${group.corsProxyUrl}`);
+          
+          let corsResponse = await fetch(group.corsProxyUrl, {
+            method: 'GET',
+            headers: {
+              'Accept': 'text/plain, application/json',
+              'Cache-Control': 'no-cache'
+            },
+            signal: AbortSignal.timeout(15000) // 15 second timeout for CORS proxy
+          });
+
+          console.log(`📊 CORS Proxy Response status: ${corsResponse.status}`);
+
+          if (corsResponse.ok) {
+            const text = await corsResponse.text();
+            
+            console.log(`✅ CORS Proxy data fetched: ${text.length} chars`);
+            console.log(`📝 First 100 chars: ${text.substring(0, 100)}`);
+            
+            const satellites = parseTLEData(text, 'cors-proxy-live');
+            
+            setData({
+              satellites,
+              source: 'LIVE',
+              isLoading: false,
+              error: null,
+              satelliteCount: satellites.size,
+              group
+            });
+            return;
+          }
+
+          throw new Error(`CORS Proxy returned status ${corsResponse.status}`);
+
+        } catch (corsError) {
+          console.warn(`⚠️ CORS proxy failed for ${id}, trying fallback:`, corsError);
+        }
+      } else {
+        console.log('🏠 Development mode detected - using local proxy');
+        // Strategy 1: Try to fetch from our Vite proxy (for development)
+        let response = await fetch(group.proxyUrl, {
           method: 'GET',
           headers: {
             'Accept': 'text/plain, application/json',
             'Cache-Control': 'no-cache'
           },
-          signal: AbortSignal.timeout(15000) // 15 second timeout for CORS proxy
+          signal: AbortSignal.timeout(10000) // 10 second timeout
         });
 
-        console.log(`📊 CORS Proxy Response status: ${corsResponse.status}`);
+        console.log(`📊 Response status: ${response.status} for ${group.proxyUrl}`);
 
-        if (corsResponse.ok) {
-          const text = await corsResponse.text();
+        if (response.ok) {
+          const contentType = response.headers.get('content-type');
           
-          console.log(`✅ CORS Proxy data fetched: ${text.length} chars`);
-          console.log(`📝 First 100 chars: ${text.substring(0, 100)}`);
-          
-          const satellites = parseTLEData(text, 'cors-proxy-live');
-          
-          setData({
-            satellites,
-            source: 'LIVE',
-            isLoading: false,
-            error: null,
-            satelliteCount: satellites.size,
-            group
-          });
-          return;
+          if (contentType?.includes('application/json')) {
+            // Proxy returned an error JSON
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Proxy error');
+          } else {
+            // Proxy returned TLE data successfully
+            const text = await response.text();
+            
+            console.log(`✅ Live data fetched: ${text.length} chars`);
+            console.log(`📝 First 100 chars: ${text.substring(0, 100)}`);
+            
+            const satellites = parseTLEData(text, 'proxy-live');
+            
+            setData({
+              satellites,
+              source: 'LIVE',
+              isLoading: false,
+              error: null,
+              satelliteCount: satellites.size,
+              group
+            });
+            return;
+          }
         }
 
-        throw new Error(`CORS Proxy returned status ${corsResponse.status}`);
-
-      } catch (corsError) {
-        console.warn(`⚠️ CORS proxy failed for ${id}, trying fallback:`, corsError);
+        throw new Error(`Proxy returned status ${response.status}`);
+      }
       
         // Strategy 2: Fallback to local static file
       try {
@@ -160,7 +165,7 @@ export function useSatelliteData(categoryId: string | null): SatelliteData {
         });
 
       } catch (fallbackError) {
-        console.error(` Both proxy and fallback failed for ${id}:`, fallbackError);
+        console.error(`❌ Both proxy and fallback failed for ${id}:`, fallbackError);
         
         // Strategy 3: Use hardcoded fallback data
         const hardcodedFallbacks = getHardcodedFallbacks(id);
@@ -169,14 +174,22 @@ export function useSatelliteData(categoryId: string | null): SatelliteData {
           satellites: hardcodedFallbacks,
           source: 'OFFLINE',
           isLoading: false,
-          error: proxyError instanceof Error ? proxyError.message : 'Failed to fetch satellite data',
+          error: fallbackError instanceof Error ? fallbackError.message : 'Failed to fetch satellite data',
           satelliteCount: hardcodedFallbacks.size,
           group
         });
       }
+    } catch (error) {
+      console.error(`❌ Critical error in fetchSatelliteData:`, error);
+      setData({
+        satellites: new Map(),
+        source: 'ERROR',
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        satelliteCount: 0,
+        group
+      });
     }
-  };
-
   }, [getSatelliteGroup, parseTLEData]);
 
   // Helper function to get hardcoded fallback data
