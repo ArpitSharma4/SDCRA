@@ -59,18 +59,25 @@ export function useSatelliteData(categoryId: string | null): SatelliteData {
             method: 'GET',
             headers: {
               'Accept': 'text/plain, application/json',
-              'Cache-Control': 'no-cache'
+              'Cache-Control': 'no-cache',
+              'User-Agent': 'Mozilla/5.0 (compatible; SDCRA/1.0)'
             },
-            signal: AbortSignal.timeout(15000) // 15 second timeout for CORS proxy
+            signal: AbortSignal.timeout(20000) // Increased timeout to 20 seconds
           });
 
           console.log(`📊 CORS Proxy Response status: ${corsResponse.status}`);
+          console.log(`📊 CORS Proxy Response headers:`, Object.fromEntries(corsResponse.headers.entries()));
 
           if (corsResponse.ok) {
             const text = await corsResponse.text();
             
             console.log(`✅ CORS Proxy data fetched: ${text.length} chars`);
             console.log(`📝 First 100 chars: ${text.substring(0, 100)}`);
+            
+            // Check if we got actual TLE data or an error page
+            if (text.includes('Access Denied') || text.includes('403 Forbidden') || text.includes('<!DOCTYPE html>')) {
+              throw new Error('CORS proxy returned access denied or HTML error page');
+            }
             
             const satellites = parseTLEData(text, 'cors-proxy-live');
             
@@ -88,7 +95,58 @@ export function useSatelliteData(categoryId: string | null): SatelliteData {
           throw new Error(`CORS Proxy returned status ${corsResponse.status}`);
 
         } catch (corsError) {
-          console.warn(`⚠️ CORS proxy failed for ${id}, trying fallback:`, corsError);
+          console.warn(`⚠️ CORS proxy failed for ${id}, trying backup CORS proxy:`, corsError);
+          console.warn(`⚠️ CORS proxy error details:`, {
+            message: corsError.message,
+            name: corsError.name,
+            stack: corsError.stack
+          });
+          
+          // Try backup CORS proxy
+          try {
+            console.log(`🔄 Trying backup CORS proxy: ${group.corsProxyUrl2}`);
+            
+            let corsResponse2 = await fetch(group.corsProxyUrl2, {
+              method: 'GET',
+              headers: {
+                'Accept': 'text/plain, application/json',
+                'Cache-Control': 'no-cache',
+                'User-Agent': 'Mozilla/5.0 (compatible; SDCRA/1.0)'
+              },
+              signal: AbortSignal.timeout(20000) // 20 second timeout
+            });
+
+            console.log(`📊 Backup CORS Proxy Response status: ${corsResponse2.status}`);
+
+            if (corsResponse2.ok) {
+              const text = await corsResponse2.text();
+              
+              console.log(`✅ Backup CORS Proxy data fetched: ${text.length} chars`);
+              console.log(`📝 First 100 chars: ${text.substring(0, 100)}`);
+              
+              // Check if we got actual TLE data or an error page
+              if (text.includes('Access Denied') || text.includes('403 Forbidden') || text.includes('<!DOCTYPE html>')) {
+                throw new Error('Backup CORS proxy returned access denied or HTML error page');
+              }
+              
+              const satellites = parseTLEData(text, 'backup-cors-proxy-live');
+              
+              setData({
+                satellites,
+                source: 'LIVE',
+                isLoading: false,
+                error: null,
+                satelliteCount: satellites.size,
+                group
+              });
+              return;
+            }
+
+            throw new Error(`Backup CORS Proxy returned status ${corsResponse2.status}`);
+
+          } catch (corsError2) {
+            console.warn(`⚠️ Backup CORS proxy also failed for ${id}, trying fallback:`, corsError2);
+          }
         }
       } else {
         console.log('🏠 Development mode detected - using local proxy');
