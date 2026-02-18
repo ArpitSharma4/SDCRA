@@ -78,9 +78,9 @@ app.post('/api/ai/command', async (req, res) => {
 });
 
 // Celestrak proxy endpoints to solve CORS/HTTPS issues
-app.get('/api/celestrak/*', async (req, res) => {
+app.use('/api/celestrak', async (req, res) => {
   try {
-    const celestrakUrl = `https://celestrak.org${req.path.replace('/api/celestrak', '')}`;
+    const celestrakUrl = `https://celestrak.org${req.originalUrl.replace('/api/celestrak', '')}`;
     console.log(`🛰️ Proxying request to: ${celestrakUrl}`);
     
     const response = await fetch(celestrakUrl);
@@ -93,26 +93,26 @@ app.get('/api/celestrak/*', async (req, res) => {
     res.set({
       'Content-Type': response.headers.get('Content-Type') || 'text/plain',
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Cache-Control': 's-maxage=300, stale-while-revalidate'
     });
     
     const data = await response.text();
     res.send(data);
     
   } catch (error) {
-    console.error('Celestrak proxy error:', error);
+    console.error('❌ Celestrak proxy error:', error);
     res.status(500).json({ 
-      error: 'Failed to fetch satellite data',
+      error: 'Failed to fetch from Celestrak',
       message: error.message 
     });
   }
 });
 
 // Alternative Celestrak proxy (for celestrak.com)
-app.get('/api/celestrak-com/*', async (req, res) => {
+app.use('/api/celestrak-com', async (req, res) => {
   try {
-    const celestrakUrl = `https://celestrak.com${req.path.replace('/api/celestrak-com', '')}`;
+    const celestrakUrl = `https://celestrak.com${req.originalUrl.replace('/api/celestrak-com', '')}`;
     console.log(`🛰️ Proxying request to: ${celestrakUrl}`);
     
     const response = await fetch(celestrakUrl);
@@ -125,17 +125,17 @@ app.get('/api/celestrak-com/*', async (req, res) => {
     res.set({
       'Content-Type': response.headers.get('Content-Type') || 'text/plain',
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Cache-Control': 's-maxage=300, stale-while-revalidate'
     });
     
     const data = await response.text();
     res.send(data);
     
   } catch (error) {
-    console.error('Celestrak proxy error:', error);
+    console.error('❌ Celestrak proxy error:', error);
     res.status(500).json({ 
-      error: 'Failed to fetch satellite data',
+      error: 'Failed to fetch from Celestrak',
       message: error.message 
     });
   }

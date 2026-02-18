@@ -157,7 +157,7 @@ export default function AboutPage() {
                     className="mt-4 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/60 font-mono text-sm"
                   >
                     <a
-                      href="https://github.com"
+                      href="https://github.com/ArpitSharma4"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2"
