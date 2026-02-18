@@ -159,7 +159,7 @@ export const KesslerTerminal: React.FC = () => {
     return (
       <button
         onClick={toggleTerminal}
-        className={`btn-glass fixed bottom-6 right-24 z-50 px-4 py-2 text-slate-200 font-mono text-sm uppercase tracking-wider transition-all duration-300 ${
+        className={`btn-glass fixed bottom-6 right-6 z-50 px-4 py-2 text-slate-200 font-mono text-sm uppercase tracking-wider transition-all duration-300 ${
           isScrolled ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'
         }`}
       >
@@ -170,7 +170,7 @@ export const KesslerTerminal: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-6 right-24 z-50 w-96 bg-slate-950 border border-cyan-500/30 backdrop-blur-md shadow-2xl shadow-cyan-500/10">
+    <div className="fixed bottom-6 right-6 z-50 w-96 bg-slate-950 border border-cyan-500/30 backdrop-blur-md shadow-2xl shadow-cyan-500/10">
       {/* Header */}
       <div className={`p-3 border-b flex items-center justify-between ${
         mode === 'CLOUD' 

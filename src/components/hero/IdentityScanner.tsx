@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Facehash } from 'facehash';
-import { Scan, ShieldCheck, ChevronRight, AlertTriangle, Lock } from 'lucide-react';
+import { Scan, ShieldCheck, ChevronRight, AlertTriangle, Lock, Moon, Sun } from 'lucide-react';
+import { Switch } from '../ui/switch';
 
-const IdentityScanner = () => {
+interface IdentityScannerProps {
+  isNightMode?: boolean;
+  setIsNightMode?: (value: boolean) => void;
+}
+
+const IdentityScanner = ({ isNightMode = false, setIsNightMode }: IdentityScannerProps) => {
   const [name, setName] = useState(() => {
     // Check sessionStorage immediately on component creation
     return sessionStorage.getItem('sdcra_user') || '';
@@ -44,7 +50,8 @@ const IdentityScanner = () => {
 
   return (
     <div className="flex flex-col gap-3 max-w-md">
-      <div className={`relative group transition-all duration-500 ${isFocused ? 'scale-[1.02]' : ''}`}>
+      <div className="flex gap-8 items-start">
+        <div className={`relative group transition-all duration-500 ${isFocused ? 'scale-[1.02]' : ''} flex-1 min-w-[350px]`}>
         
         {/* 1. THE CARD CONTAINER */}
         <div className="w-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 rounded-xl p-4 flex items-center gap-4 hover:border-cyan-400/60 hover:shadow-[0_0_30px_rgba(6,182,212,0.15)] overflow-hidden">
@@ -69,7 +76,6 @@ const IdentityScanner = () => {
                 {isLocked ? <Lock className="w-3 h-3" /> : <Scan className="w-3 h-3" />}
                 {isLocked ? 'IDENTITY VERIFIED' : 'ENTER CALLSIGN'}
               </span>
-             
             </div>
 
             {!isLocked ? (
@@ -112,6 +118,21 @@ const IdentityScanner = () => {
              <div className="absolute -right-10 -top-10 w-32 h-32 bg-cyan-500/10 blur-3xl rounded-full pointer-events-none" />
           )}
         </div>
+        </div>
+        
+        {/* Day/Night Switch - positioned next to the card */}
+        {setIsNightMode && (
+          <div className="flex items-center gap-2 py-2 flex-shrink-0">
+            <span className="text-xs uppercase tracking-widest text-slate-500 font-mono">View:</span>
+            <button
+              onClick={() => setIsNightMode(!isNightMode)}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 text-white text-sm font-medium transition-colors duration-200 hover:bg-slate-700"
+            >
+              {isNightMode ? <Moon className="w-4 h-4 text-sky-400" /> : <Sun className="w-4 h-4 text-orange-400" />}
+              {isNightMode ? 'Night' : 'Day'}
+            </button>
+          </div>
+        )}
       </div>
       
       {/* Privacy Protocol Disclaimer */}

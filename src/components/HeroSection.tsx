@@ -115,7 +115,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="flex flex-col gap-6 mt-8"
           >
-            <IdentityScanner />
+            <IdentityScanner isNightMode={isNightMode} setIsNightMode={setIsNightMode} />
             
             <p className="text-slate-500 text-xs font-mono">
               * DATA PERSISTS FOR SESSION DURATION ONLY. NO CLOUD STORAGE.
